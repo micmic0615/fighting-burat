@@ -53,6 +53,8 @@ CONF.units = {
 	],
 };
 
+var SOCKET = null;
+
 var GEAR = {
 	arms: [],
 	head: [],
