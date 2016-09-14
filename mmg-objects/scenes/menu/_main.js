@@ -1,4 +1,11 @@
 define(function () {return function(SCENE){
+
+	
+
+	SOCKET.on("res.select_buff",  function (data) {
+		alert(data.user + " have selected " + data.buff)
+	})
+
 	SCENE.icons = {};
 	SCENE.bars = {};
 
@@ -129,6 +136,9 @@ define(function () {return function(SCENE){
 
 	function select_buff(){
 		var alias = this.alias.split("buffs_").join("");
+		SOCKET.emit("req.select_buff", {user:USER.name, buff:BUFFS[alias].title})
+		
+		
 		buff_title.text = BUFFS[alias].title + " [" + BUFFS[alias].cost + "]"
 		buff_tooltip.text = BUFFS[alias].tooltip
 		if (alias != selected_alias){

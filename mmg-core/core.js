@@ -1,3 +1,8 @@
+var UNV = {};
+var BUFFS = {};
+var SOCKET = null;
+var USER = null;
+
 MMG.uGroups = {};
 MMG.uTypes = {};
 

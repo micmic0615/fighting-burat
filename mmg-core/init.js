@@ -104,6 +104,7 @@ window.onload = function(){
 	try{
 		Cocoon.App.WebView.on("load", {
 			success : function(){
+
 				console.log("Android Build!")
 			},
 			error : function(){

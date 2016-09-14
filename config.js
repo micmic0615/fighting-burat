@@ -1,7 +1,6 @@
 var MMG = {};
-var UNV = {};
 var CONF = {};
-var BUFFS = {};
+
 
 MMG.cps = 50;
 MMG.fps = 60;
@@ -52,8 +51,6 @@ CONF.units = {
 		"ui.btns_gameplay", 
 	],
 };
-
-var SOCKET = null;
 
 var GEAR = {
 	arms: [],
