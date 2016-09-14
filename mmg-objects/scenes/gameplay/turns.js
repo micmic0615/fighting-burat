@@ -1,32 +1,27 @@
 define(function () { return function(){
-	var turn = this.turn;
-	var combat = this.combat;
-	var player = this.player;
-
-	var next = {};
-
 	var unit_stats = {
-		hero: initialize_stats(this.getUnit("hero"), this.world.width/2 - 45),
-		enemy: initialize_stats(this.getUnit("enemy"), this.world.width/2 + 45),
+		"hero": initialize_stats.bind(this)("hero", this.world.width/2 - 45),
+		"enemy": initialize_stats.bind(this)("enemy", this.world.width/2 + 45),
 	};
 
-	var game_over = false;
-	var game_over_delay = 100;
+	function initialize_stats(alias, locX){
+		var unit = this.getUnit(alias);
 
-	function initialize_stats(unit, locX){
-		return {
-			health: unit.current.health,
-			stamina: unit.current.stamina,
-			defense: unit.current.defense,
-			block: unit.current.block,
+		this.fighters[alias] = {
 			health_max: unit.derived.health,
 			stamina_max: unit.derived.stamina,
 			defense_max: unit.derived.defense,
 			damage: unit.derived.damage,
 			force: unit.derived.force,
-			poise: unit.derived.poise,
+			poise: unit.derived.poise,			
 			stamina_cost: unit.derived.cost,
-			aggresion: 1,
+		}
+
+		return {
+			health: unit.current.health,
+			stamina: unit.current.stamina,
+			defense: unit.current.defense,
+			block: unit.current.block,			
 			buffs: unit.buffs,
 			debuffs: unit.debuffs,
 			staminaregen: unit.staminaregen,
@@ -34,15 +29,18 @@ define(function () { return function(){
 		};
 	};	
 
+	var game_over = false;
+	var game_over_delay = 100;
+
 	function apply_buffs(unit){
-		var next_turn = turn.sequence[turn.index + 1];
+		var next_turn = this.turn.sequence[this.turn.index + 1];
 
 		if (unit.prebuffs.length > 0){
 			if (next_turn.unit_stats[unit.alias].buffs.length < 10){
 				
 				for (var i = 0; i < unit.prebuffs.length; ++i) {
 					var p = unit.prebuffs[i];
-					turn.sequence[turn.index + 1].unit_stats[unit.alias].buffs.push(p);
+					this.turn.sequence[this.turn.index + 1].unit_stats[unit.alias].buffs.push(p);
 					
 					unit.prebuffs.splice(i,1); i--;
 				};
@@ -59,8 +57,8 @@ define(function () { return function(){
 					}
 				};				
 
-				for (var i = turn.index + 1; i < turn.sequence.length; ++i) {
-					var p = turn.sequence[i];
+				for (var i = this.turn.index + 1; i < this.turn.sequence.length; ++i) {
+					var p = this.turn.sequence[i];
 					p.evaluated = false;
 				};
 
@@ -68,38 +66,38 @@ define(function () { return function(){
 					var test_before = [];
 					var test_after = []
 					
-					for (var i = turn.index; i < recalc_duration + turn.index; ++i) {
-						var p = turn.sequence[i];
+					for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
+						var p = this.turn.sequence[i];
 						test_before.push(p.origin)
 					}
 
-					calculate_turns.bind(this)(turn.index + 1, recalc_duration);
+					calculate_turns.bind(this)(this.turn.index + 1, recalc_duration);
 
-					for (var i = turn.index; i < recalc_duration + turn.index; ++i) {
-						var p = turn.sequence[i];
+					for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
+						var p = this.turn.sequence[i];
 						test_after.push(p.origin)
 					}
 				} else {
-					evaluate_sequence.bind(this)(turn.index + 1)
+					evaluate_sequence.bind(this)(this.turn.index + 1)
 				};
 			};
 		};
 	};
 
 	function change_turn_phase(){
-		var current_turn = turn.sequence[turn.index];
+		var current = this.turn.sequence[this.turn.index];
 
-		var origin = this.getUnit(current_turn.origin);
-		var target = this.getUnit(current_turn.target);
+		var origin = this.getUnit(current.origin);
+		var target = this.getUnit(current.target);
 
 		if (origin.current.health <= 0 || target.current.health <= 0){if (origin.alias == "hero"){var message = "YOU WIN!"} else {var message = "YOU LOSE!"}; game_over = true};
 
-		turn.phase++;
-		if (turn.phase > 3){						
-			turn.index++; 
-			turn.phase = 0; 
-			if (turn.index + turn.foresight > turn.sequence.length){calculate_turns.bind(this)()};
-			if (player.mana_current + player.mana_regen >=  player.mana_max){player.mana_current = player.mana_max} else {player.mana_current += player.mana_regen};
+		this.turn.phase++;
+		if (this.turn.phase > 3){						
+			this.turn.index++; 
+			this.turn.phase = 0; 
+			if (this.turn.index + this.turn.foresight > this.turn.sequence.length){calculate_turns.bind(this)()};
+			if (this.player.mana_current + this.player.mana_regen >=  this.player.mana_max){this.player.mana_current = this.player.mana_max} else {this.player.mana_current += this.player.mana_regen};
 		};
 	};
 	
@@ -108,20 +106,20 @@ define(function () { return function(){
 		var turn_agility = 0;
 
 		var keys = Object.keys(unit_stats);
-		var current_turn = turn.sequence[index];
+		var current = this.turn.sequence[index];
 		
 		var unit_buffs = unit_stats;
 
 		for (var i = 0; i < keys.length; ++i) {
 			var p = keys[i];
-			var unit = JSON.parse(JSON.stringify(this.getUnit(p).derived));
+			var unit = this.getUnit(p).derived.clone();
 
 			unit._agi = { factor: 1, total: 0, actions: 0 };
 
-			if (current_turn != undefined) {
-				for (var i2 = 0; i2 < current_turn.unit_stats[p].buffs.length; ++i2) {
-					var p2 = current_turn.unit_stats[p].buffs[i2];
-					if (p2.effects == "speed_up") {if (p2.duration >= turn.sequence_max) {unit._agi.factor += p2.factor} else {unit._agi.factor += p2.factor * (p2.duration / turn.sequence_max)}}
+			if (current != undefined) {
+				for (var i2 = 0; i2 < current.unit_stats[p].buffs.length; ++i2) {
+					var p2 = current.unit_stats[p].buffs[i2];
+					if (p2.effects == "speed_up") {if (p2.duration >= this.turn.sequence_max) {unit._agi.factor += p2.factor} else {unit._agi.factor += p2.factor * (p2.duration / this.turn.sequence_max)}}
 				}
 			}
 
@@ -133,15 +131,15 @@ define(function () { return function(){
 		for (var i = 0; i < keys.length; ++i) {
 			var unit = units[keys[i]];
 
-			unit._agi.actions = Math.round((unit._agi.total) / (turn_agility) * turn.sequence_max);
+			unit._agi.actions = Math.round((unit._agi.total) / (turn_agility) * this.turn.sequence_max);
 
-			if (unit._agi.actions >= turn.sequence_max) { unit._agi.actions = turn.sequence_max - (keys.length - 1) };
+			if (unit._agi.actions >= this.turn.sequence_max) { unit._agi.actions = this.turn.sequence_max - (keys.length - 1) };
 			if (unit._agi.actions <= 1) { unit._agi.actions = 1 };
 		}
 
 		var temp_sequence = [];
 
-		while (temp_sequence.length < turn.sequence_max) {
+		while (temp_sequence.length < this.turn.sequence_max) {
 			var origin_dice = [];
 			for (var i = 0; i < keys.length; ++i) { var unit = units[keys[i]]; if (unit._agi.actions > 0) { origin_dice.push(keys[i]) } };
 			var origin_random = Math.floor(Math.random() * origin_dice.length);
@@ -152,7 +150,14 @@ define(function () { return function(){
 			for (var i = 0; i < keys.length; ++i) { if (keys[i] != origin) { target_dice.push(keys[i]) } };
 			var target_random = Math.floor(Math.random() * target_dice.length);
 			var target = target_dice[target_random];
-			if (splice == undefined){var unit_stats_temp = JSON.parse(JSON.stringify(unit_stats))} else {var unit_stats_temp = JSON.parse(JSON.stringify(turn.sequence[index].unit_stats))};
+			if (splice == undefined){var unit_stats_temp = unit_stats.clone()} else {var unit_stats_temp = this.turn.sequence[index].unit_stats.clone()};
+
+			var damage_obj = {
+				health: 0,
+				defense: 0,
+				stamina: 0,
+				leech_health: 0
+			};
 
 			temp_sequence.push({
 				evaluated: false,
@@ -162,24 +167,23 @@ define(function () { return function(){
 				unit_stats: unit_stats_temp,
 				force: 1,
 				poise: 1,
-				text: {
-					damage_health: 0,
-					damage_defense: 0,
-					damage_stamina: 0
+				damage: {
+					target: damage_obj.clone(),
+					origin: damage_obj.clone()
 				}
 			});
 		};
 
 		if (index == undefined) {
-			for (var i = 0; i < temp_sequence.length; ++i) { turn.sequence.push(temp_sequence[i]) };
+			for (var i = 0; i < temp_sequence.length; ++i) { this.turn.sequence.push(temp_sequence[i]) };
 			evaluate_sequence.bind(this)(0);
 		} else {
 			var index_base = index;
 
-			if (splice != undefined) { turn.sequence.splice(index, splice) };
+			if (splice != undefined) { this.turn.sequence.splice(index, splice) };
 
 			for (var i = 0; i < temp_sequence.length; ++i) {
-				turn.sequence.splice(index, 0, temp_sequence[i]);
+				this.turn.sequence.splice(index, 0, temp_sequence[i]);
 				index++
 			};
 
@@ -188,10 +192,8 @@ define(function () { return function(){
 	};
 
 	function evaluate_sequence(index) {
-		var current = turn.sequence[index];
-		var next = turn.sequence[index + 1];
-		if (index > 0) { var prev = turn.sequence[index - 1] } else { var prev = current };
-		if (index > 0) { var prev = turn.sequence[index - 1] };
+		var current = this.turn.sequence[index];
+		var next = this.turn.sequence[index + 1];
 
 		if (!current.evaluated) {
 			var origin = current.origin;
@@ -202,9 +204,7 @@ define(function () { return function(){
 
 			for (var u = 0; u < fighters.length; ++u) {
 				var b = fighters[u];
-				var next_unit = next.unit_stats[b];
-
-				next_unit = JSON.parse(JSON.stringify(current.unit_stats[b]));
+				var next_unit = current.unit_stats[b].clone();
 
 				for (var i = 0; i < next_unit.buffs.length; ++i) {
 					var p = next_unit.buffs[i];
@@ -216,14 +216,14 @@ define(function () { return function(){
 					if (p.duration > 0) { next_unit.debuffs[i].duration-- } else { next_unit.debuffs.splice(i, 1); i-- }
 				}
 
-				var stamina_regen = next_unit.stamina_max * combat.stamina_regen_factor;
+				var stamina_regen = this.fighters[b].stamina_max * this.combat.stamina_regen_factor;
 
 				for (var i = 0; i < next_unit.staminaregen.length; ++i) {
 					var p = next_unit.staminaregen[i];
 					if (p > 0) {
 					next_unit.staminaregen[i]--;
-						if (next_unit.stamina + stamina_regen >= next_unit.stamina_max) {
-							next_unit.stamina = next_unit.stamina_max;
+						if (next_unit.stamina + stamina_regen >= this.fighters[b].stamina_max) {
+							next_unit.stamina = this.fighters[b].stamina_max;
 						} else {
 							next_unit.stamina += stamina_regen;
 						}
@@ -268,17 +268,17 @@ define(function () { return function(){
 				};
 
 				if (buff_effects[b]["health_heal_add"] > 0) {
-					if (next_unit.health + buff_effects[b]["health_heal_add"] >= next_unit.health_max) {next_unit.health = next_unit.health_max}
+					if (next_unit.health + buff_effects[b]["health_heal_add"] >= this.fighters[b].health_max) {next_unit.health = this.fighters[b].health_max}
 					else {next_unit.health += buff_effects[b]["health_heal_add"]};
 				};
 
 				if (buff_effects[b]["stamina_heal_add"] > 0) {
-					if (next_unit.stamina + buff_effects[b]["stamina_heal_add"] >= next_unit.stamina_max) {ext_unit.stamina = next_unit.stamina_max}
+					if (next_unit.stamina + buff_effects[b]["stamina_heal_add"] >= this.fighters[b].stamina_max) {next_unit.stamina = this.fighters[b].stamina_max}
 					else {next_unit.stamina += buff_effects[b]["stamina_heal_add"]};
 				};
 
 				if (buff_effects[b]["blocks_add"] > 0) {
-					if (next_unit.block + buff_effects[b]["blocks_add"] >= combat.blocks_max) {next_unit.block = combat.blocks_max} 
+					if (next_unit.block + buff_effects[b]["blocks_add"] >= this.combat.blocks_max) {next_unit.block = this.combat.blocks_max} 
 					else {next_unit.block += buff_effects[b]["blocks_add"]};
 				};
 
@@ -286,11 +286,11 @@ define(function () { return function(){
 					if (next_unit.health - buff_effects[b]["transmute_add"] / 2 <= 0) {next_unit.health = 1}
 					else {next_unit.health -= buff_effects[b]["transmute_add"] / 2};
 
-					if (next_unit.defense + buff_effects[b]["transmute_add"] >= next_unit.defense_max) {next_unit.defense = next_unit.defense_max}
+					if (next_unit.defense + buff_effects[b]["transmute_add"] >= this.fighters[b].defense_max) {next_unit.defense = this.fighters[b].defense_max}
 					else {next_unit.defense += buff_effects[b]["transmute_add"]};
 				};
 
-			
+				next.unit_stats[b] = next_unit;
 			};
 
 			var stunned = false;
@@ -298,8 +298,8 @@ define(function () { return function(){
 
 			if (!stunned){
 				if (current.unit_stats[origin].stamina > 0) {
-					var attack_chance = (current.unit_stats[origin].stamina / current.unit_stats[origin].stamina_max) * 100;
-					var attack_proc = ((Math.random() * current.unit_stats[origin].stamina_max) / current.unit_stats[origin].stamina_max) * 100;					
+					var attack_chance = (current.unit_stats[origin].stamina / this.fighters[origin].stamina_max) * 100;
+					var attack_proc = ((Math.random() * this.fighters[origin].stamina_max) / this.fighters[origin].stamina_max) * 100;					
 
 					if (attack_proc <= attack_chance) { var action = "attack" } else { var action = "cast" };
 				} else {
@@ -307,195 +307,48 @@ define(function () { return function(){
 				}	
 			} else {
 				var action = "skip"
-			};				
-
-			var damage_health = 0;
-			var damage_defense = 0;
-			var damage_stamina = 0;
-
-			var return_damage_health = 0;
-			var return_damage_defense = 0;
-			var return_damage_stamina = 0;
-
-			var leech_health = 0;
-
-			var knockback_damage = 0;
-
-			var push_force = current.unit_stats[origin].force + buff_effects[origin].force_add;
-			var push_poise = current.unit_stats[target].poise;			
-
-			switch (action) {
-				case "attack":
-					this.calc_attack(current.unit_stats[origin], current.unit_stats[target]);
-
-					var damage_total = (current.unit_stats[origin].damage * buff_effects[origin].health_dmg_multiply * buff_effects[target].reduce_dmg_divide) + (buff_effects[origin].health_dmg_add + buff_effects[target].reduce_dmg_subtract);
-
-					if (current.unit_stats[target].block > 0) {
-						var damage_health_factor = 0.25;
-						var damage_defense_factor = 0.75;
-						var push_resist = 2;
-						next.unit_stats[target].block--;
-					} else {
-						var damage_health_factor = 0.5;
-						var damage_defense_factor = 0.5;
-						var push_resist = 1;
-					}
-
-					if (Math.round(damage_total * damage_defense_factor) >= current.unit_stats[target].defense) {
-						damage_defense = current.unit_stats[target].defense;
-						var damage_defense_spill = Math.round(damage_total * damage_defense_factor) - damage_defense;
-					} else {
-						damage_defense = Math.round(damage_total * damage_defense_factor);
-						var damage_defense_spill = 0;
-					}
-
-					damage_defense *= buff_effects[origin].defense_dmg_multiply;
-					damage_defense += buff_effects[origin].defense_dmg_add;
-					if (Math.round(damage_defense) >= current.unit_stats[target].defense) { damage_defense = current.unit_stats[target].defense }
-
-					damage_health = Math.round((damage_total * damage_health_factor) + damage_defense_spill);
-
-					if (current.unit_stats[target].stamina > 0) {
-						damage_stamina = (current.unit_stats[target].stamina - (current.unit_stats[target].stamina / buff_effects[origin].stamina_dmg_multiply)) + buff_effects[origin].stamina_dmg_add;
-					} else {
-						damage_stamina = buff_effects[origin].stamina_dmg_add;
-					}
-
-					if (current.unit_stats[target].stamina - damage_stamina <= 0){damage_stamina *= 0.5};
-
-					if (current.unit_stats[origin].locX > current.unit_stats[target].locX) { var push_direction = -1 } else { var push_direction = 1 };
-
-					var total_push = (Math.round((push_force / push_poise) * combat.flinch_push_duration) * push_direction * combat.flinch_push_movement) + (push_direction * combat.flinch_push_movement * combat.flinch_push_base);
-					total_push /= push_resist;
-
-					if (next.unit_stats[target].locX + total_push <= combat.margin) {
-						var knockback_damage = combat.margin - (next.unit_stats[target].locX + total_push);
-						next.unit_stats[target].locX = combat.margin;
-					} else if (next.unit_stats[target].locX + total_push >= this.world.width - combat.margin) {
-						knockback_damage = (next.unit_stats[target].locX + total_push) - (this.world.width - combat.margin);
-						next.unit_stats[target].locX = this.world.width - combat.margin;
-					} else {
-						next.unit_stats[target].locX += total_push;
-					}
-
-					damage_health += knockback_damage * combat.knockback_damage_factor;
-
-					if (damage_defense_spill > 0){damage_health *= 1.25};
-
-					if (Math.abs(current.unit_stats[origin].locX - current.unit_stats[target].locX) > combat.attack_distance) {
-						current.unit_stats[origin].locX = current.unit_stats[target].locX + push_direction * -1 * combat.attack_distance;
-						next.unit_stats[origin].locX = current.unit_stats[origin].locX;
-					}					
-
-					damage_health = Math.round(damage_health);
-					damage_stamina = Math.round(damage_stamina);
-					damage_defense = Math.round(damage_defense);
-
-					next.unit_stats[target].health -= damage_health;
-					next.unit_stats[target].stamina -= damage_stamina;
-					next.unit_stats[target].defense -= damage_defense;
-
-					return_damage_health = Math.round(buff_effects[target].health_dmg_reflect_add);
-					return_damage_defense = Math.round(buff_effects[target].defense_dmg_reflect_add);		
-					if (next.unit_stats[origin].defense - return_damage_defense <= 0){return_damage_defense = next.unit_stats[origin].defense};
-
-					leech_health = Math.round(buff_effects[origin].lifesteal_add);
-
-					if (next.unit_stats[origin].health + leech_health >= next.unit_stats[origin].health_max){
-						next.unit_stats[origin].health = next.unit_stats[origin].health_max;
-					} else {
-						next.unit_stats[origin].health += leech_health;
-					}
-					
-					next.unit_stats[origin].health -= return_damage_health;
-					next.unit_stats[origin].defense -= return_damage_defense;
-					next.unit_stats[origin].stamina -= next.unit_stats[origin].stamina_cost;
-
-					if (buff_effects[origin].stun_add > 0){
-						next.unit_stats[target].debuffs.push({
-							alias: "stun",
-							factor: 0,
-							duration: buff_effects[origin].stun_add
-						})
-					};
-
-					break;
-
-				case "cast":
-					next.unit_stats[origin].staminaregen.push(combat.stamina_regen_duration)
-
-					if (next.unit_stats[origin].block + 1 >= combat.blocks_max) {
-						next.unit_stats[origin].block = combat.blocks_max;
-					} else {
-						next.unit_stats[origin].block++;
-					}
-
-					if (current.unit_stats[origin].locX > current.unit_stats[target].locX) { var flee_direction = -1 } else { var flee_direction = 1 };
-					var total_flee = flee_direction * combat.cast_repel_factor * (combat.cast_time_duration + combat.cast_channel_duration);
-
-					if (next.unit_stats[target].locX + total_flee <= combat.margin) {
-						next.unit_stats[target].locX = combat.margin
-					} else if (next.unit_stats[target].locX + total_flee >= this.world.width - combat.margin) {
-						next.unit_stats[target].locX = this.world.width - combat.margin
-					} else {
-						next.unit_stats[target].locX += total_flee;
-					}
-
-					break;
-
-				case "skip":
-					console.log("skip")
-					break
-			};
+			};		
 
 			current.action = action;
-			current.text.damage_health = damage_health;
-			current.text.damage_defense = damage_defense;
-			current.text.damage_stamina = damage_stamina;
+			current.force = this.fighters[origin].force + buff_effects[origin].force_add;
+			current.poise = this.fighters[target].poise;
 
-			current.text.return_damage_health = return_damage_health;
-			current.text.return_damage_defense = return_damage_defense;
-			current.text.return_damage_stamina = return_damage_stamina;
+			current.evaluated = true;	
 
-			current.text.leech_health = leech_health;
-
-			current.force = push_force;
-			current.poise = push_poise;
-
-			current.evaluated = true;
+			this["action_" + action](index, buff_effects);
 		}
 
 		index++
-		if (index < turn.sequence.length - 3) { evaluate_sequence.bind(this)(index) };
+		if (index < this.turn.sequence.length - 3) { evaluate_sequence.bind(this)(index) };
 	};
 
 	function run_turns(){
 		if (MMG.stage == undefined) return null;
 		
-		if (turn.sequence.length == 0){
-			while(turn.sequence.length < turn.foresight - turn.sequence_max){calculate_turns.bind(this)()};
+		if (this.turn.sequence.length == 0){
+			while(this.turn.sequence.length < this.turn.foresight - this.turn.sequence_max){calculate_turns.bind(this)()};
 			calculate_turns.bind(this)();
 		} else {
 			if (!game_over){
-				var current_turn = turn.sequence[turn.index];
-				var next_turn = turn.sequence[turn.index + 1];
+				var current = this.turn.sequence[this.turn.index];
+				var next_turn = this.turn.sequence[this.turn.index + 1];
 
-				var origin = this.getUnit(current_turn.origin);
-				var target = this.getUnit(current_turn.target);
+				var origin = this.getUnit(current.origin);
+				var target = this.getUnit(current.target);
 
 			
-				switch(turn.phase){
+				switch(this.turn.phase){
 					case -1:
-						if (Math.abs(origin.locX - target.locX) < combat.attack_distance){change_turn_phase.bind(this)()} else {origin.walk_forward(); target.walk_forward()};
+						if (Math.abs(origin.locX - target.locX) < this.combat.attack_distance){change_turn_phase.bind(this)()} else {origin.walk_forward(); target.walk_forward()};
 						break
 					case 0: 						
-						origin.set_stats(current_turn.unit_stats[current_turn.origin]);
-						target.set_stats(current_turn.unit_stats[current_turn.target]);
+						origin.set_stats(current.unit_stats[current.origin]);
+						target.set_stats(current.unit_stats[current.target]);
 						change_turn_phase.bind(this)();
 						break;
 
 					case 1:
-						var listener = origin[current_turn.action](target, current_turn);
+						var listener = origin[current.action](target, current);
 						if (listener.origin && listener.target){change_turn_phase.bind(this)()};
 						break;
 
@@ -504,7 +357,7 @@ define(function () { return function(){
 							case "attack":
 								var next_origin = this.getUnit(next_turn.origin);
 								var next_target = this.getUnit(next_turn.target);
-								if (Math.abs(next_origin.locX - next_target.locX) > combat.attack_distance){next_origin.face_location(next_target.locX); next_origin.walk_forward()} else {change_turn_phase.bind(this)()};								
+								if (Math.abs(next_origin.locX - next_target.locX) > this.combat.attack_distance){next_origin.face_location(next_target.locX); next_origin.walk_forward()} else {change_turn_phase.bind(this)()};								
 								break
 							
 							case "cast":

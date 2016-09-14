@@ -17,11 +17,12 @@ MMG.validResolutions = [
 MMG.resolution = MMG.validResolutions[0];
 
 CONF.scenes = {
-	first: "menu",
+	first: "socket",
 	used: [
 		"gameplay",
 		"loader",
-		"menu"
+		"menu",
+		"socket"
 	],
 
 	behaviors: [

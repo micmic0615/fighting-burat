@@ -158,7 +158,6 @@ THIS_UNIT.prototype.set_stats = function(stats){
 
 				MMG.stage.drawFlyingText("+"+ total_heal + "!", "#09f", styler, 100, this.locX, this.locY - 10, 255 + randomizer);
 				break;
-				break;
 		}
 	}
 
@@ -185,26 +184,27 @@ THIS_UNIT.prototype.set_stats = function(stats){
 }
 
 THIS_UNIT.prototype.take_damage = function(origin, damage_data){
+	
 	if (MMG.stage == undefined) return null;
 
-	this.current.health -= damage_data.damage_health;
-	this.current.defense -= damage_data.damage_defense;
-	this.current.stamina -= damage_data.damage_stamina;
+	this.current.health -= damage_data.health;
+	this.current.defense -= damage_data.defense;
+	this.current.stamina -= damage_data.stamina;
 
 	if (this.locX > origin.locX){ var push_direction = 1 } else { var push_direction = -1 };
 	var randomizer = Math.random()*45*push_direction + 15*push_direction;
 
-	if (damage_data.damage_health >= damage_data.damage_defense){
-		if (damage_data.damage_health > 0){MMG.stage.drawFlyingText(damage_data.damage_health + "!", "#f00", "24px Arial", 100, this.locX, this.locY, 270 + randomizer)};	
+	if (damage_data.health >= damage_data.defense){
+		if (damage_data.health > 0){MMG.stage.drawFlyingText(damage_data.health + "!", "#f00", "24px Arial", 100, this.locX, this.locY, 270 + randomizer)};	
 	} else {
-		if (damage_data.damage_health > 0){MMG.stage.drawFlyingText(damage_data.damage_health + "!", "#f00", "18px Arial", 100, this.locX, this.locY, 270 + randomizer )};
+		if (damage_data.health > 0){MMG.stage.drawFlyingText(damage_data.health + "!", "#f00", "18px Arial", 100, this.locX, this.locY, 270 + randomizer )};
 		randomizer+=  20*push_direction;
 
-		if (damage_data.damage_defense > 0){MMG.stage.drawFlyingText(damage_data.damage_defense + "!", "#09f", "24px Arial", 100, this.locX, this.locY, 270 + randomizer)};	
+		if (damage_data.defense > 0){MMG.stage.drawFlyingText(damage_data.defense + "!", "#09f", "24px Arial", 100, this.locX, this.locY, 270 + randomizer)};	
 		randomizer+=  20*push_direction;
 	}
 
-	if (damage_data.damage_stamina > 0){MMG.stage.drawFlyingText("-brv!", "#27595c", "12px Arial", 100, this.locX, this.locY, 270 + randomizer)}
+	if (damage_data.stamina > 0){MMG.stage.drawFlyingText("-brv!", "#27595c", "12px Arial", 100, this.locX, this.locY, 270 + randomizer)}
 }
 
 
@@ -256,27 +256,27 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 		if (this.animation.frameCurrent >= 2){ 		
 			if (this.temp.damage_dealt == false){
 				var dealt = {
-					damage_health: turn_data.text.damage_health,
-					damage_defense: turn_data.text.damage_defense,
-					damage_stamina: turn_data.text.damage_stamina,
+					health: turn_data.damage.target.health,
+					defense: turn_data.damage.target.defense,
+					stamina: turn_data.damage.target.stamina,
 				};	
 				
 				target.take_damage(this, dealt); 
 
 				var returned = {
-					damage_health: turn_data.text.return_damage_health,
-					damage_defense: turn_data.text.return_damage_defense,
-					damage_stamina: turn_data.text.return_damage_stamina,
+					health: turn_data.damage.origin.health,
+					defense: turn_data.damage.origin.defense,
+					stamina: turn_data.damage.origin.stamina,
 				};
 
 				this.take_damage(target, returned);
 				this.temp.damage_dealt = true;
 
-				if(turn_data.text.leech_health > 0){
-					if (turn_data.text.leech_health + this.current.health >= this.derived.health){
+				if(turn_data.damage.origin.leech_health > 0){
+					if (turn_data.damage.origin.leech_health + this.current.health >= this.derived.health){
 						var total_heal = this.derived.health - this.current.health
 					} else {
-						var total_heal = turn_data.text.leech_health
+						var total_heal = turn_data.damage.origin.leech_health
 					}
 
 					var randomizer = 15;

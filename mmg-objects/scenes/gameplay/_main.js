@@ -1,4 +1,6 @@
 define(function () {return function(SCENE){
+	SCENE.fighters = {};
+
 	SCENE.turn = {
 		phase: -1,
 		index: 0,
@@ -70,8 +72,8 @@ define(function () {return function(SCENE){
 	// LOAD SUBSCRIPTS
 	
 	SCENE.subscript("initialize");
-	SCENE.subscript("calc_attack", ["initialize"]);	
-	SCENE.subscript("turns", ["initialize", "calc_attack"]);	
+	SCENE.subscript("turns_actions", ["initialize"]);	
+	SCENE.subscript("turns", ["initialize", "turns_actions"]);	
 
 	// ADDITIONAL PROTOTYPES
 
