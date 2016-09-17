@@ -23,9 +23,9 @@ define(function () {return function(SCENE){
 		reload: 99
 	};
 		
-	if (GLOBALS.buffs != undefined){
-		SCENE.player.buffs_available = JSON.parse(JSON.stringify(GLOBALS.buffs));
-		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(GLOBALS.buffs));
+	if (GLOBALS.my_buffs != undefined){
+		SCENE.player.buffs_available = JSON.parse(JSON.stringify(GLOBALS.my_buffs));
+		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(GLOBALS.my_buffs));
 	} else {
 		SCENE.player.buffs_available = ["agility", "armorbreak", "damage", "defense", "focusbreak", "force", "focus", "heal", "regen"];
 		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(SCENE.player.buffs_available));
@@ -77,7 +77,7 @@ define(function () {return function(SCENE){
 		}		
 	}
 
-	SCENE["__proto__"].buff_hero = function(buff, alias){
+	SCENE["__proto__"].buff_my_fighter = function(buff, alias){
 		if (buff != "_empty"){
 			if (SCENE.player.mana_current >= BUFFS[buff].cost) {
 				SCENE.player.buffs_used += 1;
@@ -85,7 +85,8 @@ define(function () {return function(SCENE){
 				var buff_to_use = JSON.parse(JSON.stringify(BUFFS[buff]));
 				buff_to_use.alias = buff;
 				buff_to_use.max_duration = buff_to_use.duration;
-				SCENE.getUnit("hero").prebuffs.push(buff_to_use);
+
+				SCENE.getUnit(GLOBALS.my_fighter).prebuffs.push(buff_to_use);
 
 				SCENE.buff_shuffle(alias.split("_")[1]);
 

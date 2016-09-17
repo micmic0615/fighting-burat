@@ -17,20 +17,22 @@ define(function () {return function(){
 		scaleY: 2
 	})
 
-	var hero = this.newUnit("main", "knight", {
+	this.newUnit("main", "knight", {
 		alias:'hero',
 		locX:(this.getScreen().width/4)*1,
 		locY:245,
 		zIndex: 100
 	});
 	
-	var enemy = this.newUnit("main", "knight", {
+	this.newUnit("main", "knight", {
 		alias:'enemy',
 		locX:(this.getScreen().width/4)*3,
 		locY:245,
 		scaleX:-1,
 		zIndex: 10
 	});
+
+	var my_fighter = this.getUnit(GLOBALS.my_fighter)
 
 	generate_icons.bind(this)();
 	
@@ -39,7 +41,7 @@ define(function () {return function(){
 	}
 
 	function click_icon(icon_name){
-		this.buff_hero(icons[icon_name].animation.sprite, icons[icon_name].alias)
+		this.buff_my_fighter(icons[icon_name].animation.sprite, icons[icon_name].alias)
 	}
 
 	function generate_icons(){
@@ -147,11 +149,11 @@ define(function () {return function(){
 		this.drawRect(10, (this.getScreen().height - 25), (this.getScreen().width - 20), 15, 1, "#606", "", {});
 		bars.current_mana = this.drawRect(10, (this.getScreen().height - 25), 0, 15, 1, "#f0f", "", {});
 
-		var hero_buffs = {}
+		var my_fighter_buffs = {}
 
 		for (var i = 0; i < 13; ++i) {
 			var p = [i];
-			hero_buffs["num_" + i] = this.newUnit("ui", "buff_icons", {
+			my_fighter_buffs["num_" + i] = this.newUnit("ui", "buff_icons", {
 				alias:'buff_stats_' + i,
 				locX: 100 + (17*i),
 				locY: 43,
@@ -217,8 +219,8 @@ define(function () {return function(){
 			texts["shuffle" ].text = String(shuffle_cost)
 
 			for (var i = 0; i < COMBAT.buffs_use_max ; ++i) {
-				if (i < hero.buffs.length){
-					var p = hero.buffs[i];
+				if (i < my_fighter.buffs.length){
+					var p = my_fighter.buffs[i];
 					
 					var opacity = 0.25  + 0.75 * (p.duration / p.max_duration);
 					icons["usedbuffs_" + i].setAnimation(p.alias);
@@ -234,7 +236,7 @@ define(function () {return function(){
 				for (var i = turn.index; i < turn.sequence_max + turn.index; ++i) {
 					var p = turn.sequence[i];
 					if (bars["speed_" + (i - turn.index)]) {bars["speed_" + (i - turn.index)].opacity = 0.25}
-					if (p.origin == "hero"){speed_meter++}
+					if (p.origin == GLOBALS.my_fighter){speed_meter++}
 				}
 
 				for (var i = 0; i < turn.sequence_max - 1; ++i) {
@@ -245,33 +247,33 @@ define(function () {return function(){
 				}
 			}	
 
-			if (hero.current.stamina > 90){
+			if (my_fighter.current.stamina > 90){
 				bars.aggro.color = "#f60";
-			} else if (hero.current.stamina > 80){
+			} else if (my_fighter.current.stamina > 80){
 				bars.aggro.color = "#d67517";
-			} else if (hero.current.stamina > 70){
+			} else if (my_fighter.current.stamina > 70){
 				bars.aggro.color = "#948c3b";
-			} else if (hero.current.stamina > 60){
+			} else if (my_fighter.current.stamina > 60){
 				bars.aggro.color = "#55a15c";
-			} else if (hero.current.stamina > 50){
+			} else if (my_fighter.current.stamina > 50){
 				bars.aggro.color = "#319e6d";
-			} else if (hero.current.stamina > 40){
+			} else if (my_fighter.current.stamina > 40){
 				bars.aggro.color = "#2e8766";
-			} else if (hero.current.stamina > 30){
+			} else if (my_fighter.current.stamina > 30){
 				bars.aggro.color = "#2b6e60";
-			} else if (hero.current.stamina > 20){
+			} else if (my_fighter.current.stamina > 20){
 				bars.aggro.color = "#27595c";
-			} else if (hero.current.stamina > 10) {
+			} else if (my_fighter.current.stamina > 10) {
 				bars.aggro.color = "#244752";
-			} else if (hero.current.stamina > 0) {
+			} else if (my_fighter.current.stamina > 0) {
 				bars.aggro.color = "#13262b";
 			} else {
 				bars.aggro.color = "#020404";
 			}
 		}
 
-		var bar_health = Math.round(300 * (hero.current.health / hero.derived.health));
-		var bar_defense = Math.round(300 * (hero.current.defense / hero.derived.defense));
+		var bar_health = Math.round(300 * (my_fighter.current.health / my_fighter.derived.health));
+		var bar_defense = Math.round(300 * (my_fighter.current.defense / my_fighter.derived.defense));
 		var bar_mana = (Math.round((this.getScreen().width - 20)) * (player.mana_current / player.mana_max));
 
 		this.update_bars(bars.current_health, bar_health, 2);
@@ -282,7 +284,7 @@ define(function () {return function(){
 
 		for (var i = 0; i < COMBAT.blocks_max; ++i) {
 			var p = bars["block_" + i];
-			if (hero.current.block > i){p.opacity = 1;} else {p.opacity = 0.35}
+			if (my_fighter.current.block > i){p.opacity = 1;} else {p.opacity = 0.35}
 		}
 	}
 

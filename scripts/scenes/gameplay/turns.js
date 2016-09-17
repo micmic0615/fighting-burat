@@ -4,7 +4,11 @@ define(function () { return function(){
 		"enemy": initialize_stats.bind(this)("enemy", this.world.width/2 + 45),
 	};
 
-	SOCKET.on("res.update_turns", function(res){
+	SOCKET.on("res.game_extend", function(res){
+		GLOBALS.turn_data = res;
+	});
+
+	SOCKET.on("res.game_buff_eval", function(res){
 		GLOBALS.turn_data = res;
 	});
 
@@ -37,60 +41,6 @@ define(function () { return function(){
 	var game_over = false;
 	var game_over_delay = 100;
 
-	function apply_buffs(unit){
-		var next_turn = GLOBALS.turn_data[this.turn.index + 1];
-
-		if (unit.prebuffs.length > 0){
-			if (next_turn.unit_stats[unit.alias].buffs.length < 10){
-				
-				for (var i = 0; i < unit.prebuffs.length; ++i) {
-					var p = unit.prebuffs[i];
-					GLOBALS.turn_data[this.turn.index + 1].unit_stats[unit.alias].buffs.push(p);
-					
-					unit.prebuffs.splice(i,1); i--;
-				};
-
-				var recalc_turns = false;
-				var recalc_duration = 0;
-
-				for (var i = 0; i < next_turn.unit_stats[unit.alias].buffs.length; ++i) {
-					var p = next_turn.unit_stats[unit.alias].buffs[i];
-					if (p.effects == "speed_up" && (p.used == undefined || p.used == false)) {
-						p.used = true;
-						recalc_turns = true
-						if (p.duration > recalc_duration){recalc_duration = p.duration}
-					}
-				};				
-
-				for (var i = this.turn.index + 1; i < GLOBALS.turn_data.length; ++i) {
-					var p = GLOBALS.turn_data[i];
-					p.evaluated = false;
-				};
-
-			
-
-				if (recalc_turns){
-					var test_before = [];
-					var test_after = []
-					
-					for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
-						var p = GLOBALS.turn_data[i];
-						test_before.push(p.origin)
-					}
-
-					calculate_turns.bind(this)(this.turn.index + 1, recalc_duration);
-
-					for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
-						var p = GLOBALS.turn_data[i];
-						test_after.push(p.origin)
-					}
-				} else {
-					evaluate_sequence.bind(this)(this.turn.index + 1)
-				};
-			};
-		};
-	};
-
 	function change_turn_phase(){
 		var current = GLOBALS.turn_data[this.turn.index];
 
@@ -104,7 +54,7 @@ define(function () { return function(){
 			this.turn.index++; 
 			this.turn.phase = 0; 
 			if (this.turn.index + this.turn.foresight > GLOBALS.turn_data.length){
-				SOCKET.emit("req.update_turns", {game_id: GLOBALS.game_id, game_index: this.turn.index});
+				SOCKET.emit("req.game_extend", {game_id: GLOBALS.game_id, game_index: this.turn.index});
 			};
 			if (this.player.mana_current + this.player.mana_regen >=  this.player.mana_max){this.player.mana_current = this.player.mana_max} else {this.player.mana_current += this.player.mana_regen};
 		};
@@ -154,8 +104,11 @@ define(function () { return function(){
 					break
 
 				case 3:
-					apply_buffs.bind(this)(origin);
-					apply_buffs.bind(this)(target);
+					if (this.getUnit(GLOBALS.my_fighter).prebuffs.length > 0){
+						SOCKET.emit("req.game_buff_eval", {game_id: GLOBALS.game_id, game_index: this.turn.index, user_id: USER._id, prebuffs: this.getUnit(GLOBALS.my_fighter).prebuffs});
+						this.getUnit(GLOBALS.my_fighter).prebuffs = [];
+					};
+
 					change_turn_phase.bind(this)();
 					break;
 			};
@@ -164,8 +117,14 @@ define(function () { return function(){
 				if (game_over_delay == 100){
 					var hero = MMG.stage.getUnit("hero");
 					var enemy = MMG.stage.getUnit("enemy");
-					if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU LOSE!"};
-					if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU WIN!"};
+
+					if (GLOBALS.my_fighter == "hero"){
+						if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU LOSE"};
+						if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU WIN"};
+					} else {
+						if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU WIN"};
+						if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU LOSE"};
+					}
 
 					this.drawFlyingText(message, "#000", "54px Arial", 100, MMG.resolution.width/2, MMG.resolution.height/2 + 50, 270);
 				}		

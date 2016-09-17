@@ -61,8 +61,14 @@ define(function () {return function(SCENE){
 				})
 
 				SOCKET.on("res.find_match.found", function(res){
-					GLOBALS.game_id = res.game_id;
+					GLOBALS.game_id = res.game._id;
 					GLOBALS.turn_data = res.turn_data;
+
+					if (res.game.user_data[0]._id == USER._id){
+						GLOBALS.my_fighter = "hero"
+					} else {
+						GLOBALS.my_fighter = "enemy"
+					}
 					
 					MMG.loadScene("gameplay");
 				});
