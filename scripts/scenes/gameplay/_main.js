@@ -11,40 +11,6 @@ define(function () {return function(SCENE){
 		reset: false,
 	}
 
-	SCENE.combat = {
-		margin: 40,
-
-		flinch_push_base: 15,
-		flinch_push_duration: 15,
-		flinch_push_movement: 2,
-		flinch_push_max_duration: 30,
-
-		attack_distance: 90,
-
-		cast_time_duration: 10,
-		cast_channel_duration: 30,
-		cast_repel_factor: 2,
-
-		knockback_damage_factor: 1,
-
-		unit_movespeed: 2.5,
-
-		buffs_use_max: 10,
-
-		buffs_max: 4,
-		buffs_foresight:2,
-
-		stamina_regen_factor: 0.04,
-		stamina_regen_duration: 5,
-
-		bonus_buff_chance: 25,
-
-		blocks_max: 10,
-
-		debuff_proc_factor: 5,
-		debuff_proc_requirement: 20,
-	}
-
 	SCENE.player = {
 		bonuses_available: [],
 		buffs_current: [],
@@ -57,9 +23,9 @@ define(function () {return function(SCENE){
 		reload: 99
 	};
 		
-	if (UNV.buffs_available != undefined){
-		SCENE.player.buffs_available = JSON.parse(JSON.stringify(UNV.buffs_available));
-		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(UNV.buffs_available));
+	if (GLOBALS.buffs != undefined){
+		SCENE.player.buffs_available = JSON.parse(JSON.stringify(GLOBALS.buffs));
+		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(GLOBALS.buffs));
 	} else {
 		SCENE.player.buffs_available = ["agility", "armorbreak", "damage", "defense", "focusbreak", "force", "focus", "heal", "regen"];
 		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(SCENE.player.buffs_available));
@@ -104,12 +70,10 @@ define(function () {return function(SCENE){
 				SCENE.player.buffs_decked = JSON.parse(JSON.stringify(SCENE.player.buffs_available));
 				SCENE.player.buffs_current = [];
 
-				while(SCENE.player.buffs_current.length < SCENE.combat.buffs_max + SCENE.combat.buffs_foresight){
+				while(SCENE.player.buffs_current.length < COMBAT.buffs_max + COMBAT.buffs_foresight){
 					SCENE.buff_shuffle("init")
 				}
 			}
-			
-			
 		}		
 	}
 
@@ -137,7 +101,7 @@ define(function () {return function(SCENE){
 
 		// var bonus_random = Math.floor(Math.random()*100);
 
-		// if (bonus_random < SCENE.combat.bonus_buff_chance){
+		// if (bonus_random < COMBAT.bonus_buff_chance){
 		// 	var buff_random = Math.floor(Math.random()*SCENE.player.bonuses_available.length);
 		// 	var selected_buff = SCENE.player.bonuses_available[buff_random];
 		// } else {
@@ -158,13 +122,13 @@ define(function () {return function(SCENE){
 		if (index != "init"){
 			SCENE.player.buffs_current.splice(index, 1);
 
-			for (var i = 0; i < SCENE.combat.buffs_max; ++i) {
+			for (var i = 0; i < COMBAT.buffs_max; ++i) {
 				var p = SCENE.player.buffs_current[i];
 				SCENE.icons["buffs_" + i].setAnimation(p);
 			}
 
-			for (var i = 0; i < SCENE.combat.buffs_foresight; ++i) {
-				var p = SCENE.player.buffs_current[i + SCENE.combat.buffs_max];
+			for (var i = 0; i < COMBAT.buffs_foresight; ++i) {
+				var p = SCENE.player.buffs_current[i + COMBAT.buffs_max];
 				SCENE.icons["nextbuffs_" + i].setAnimation(p);
 			};
 		};

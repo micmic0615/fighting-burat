@@ -1,13 +1,13 @@
 function INIT(){	
 	if (MMG.not_init){
 		require([
-			"mmg-core/objects/scenes.js",
-			"mmg-core/objects/units.js",
-			"mmg-core/objects/layers.js",
-			"mmg-core/behaviors/system/quadtree.js",
-			"mmg-core/behaviors/system/debug.js"
+			"mmg/objects/scenes.js",
+			"mmg/objects/units.js",
+			"mmg/objects/layers.js",
+			"mmg/behaviors/system/quadtree.js",
+			"mmg/behaviors/system/debug.js"
 		], function () {
-			require(["mmg-core/defaults/scenes/defaultScene.js"], function (data) {
+			require(["mmg/defaults/scenes/defaultScene.js"], function (data) {
 				MMG.scenes["defaultScene"] = data;
 				for (var i = 0; i < CONF.scenes.used.length; ++i) { DECLARE_SCENE(CONF.scenes.used[i]) };
 
@@ -15,16 +15,16 @@ function INIT(){
 			});
 
 			require([
-				"mmg-core/defaults/unit-groups/actors.js",
+				"mmg/defaults/unit-groups/actors.js",
 			], function (actors) {
 				require([
-					"mmg-core/defaults/unit-groups/doodads.js",
+					"mmg/defaults/unit-groups/doodads.js",
 				], function (doodads) {
 					require([
-						"mmg-core/defaults/unit-groups/tiles.js",
+						"mmg/defaults/unit-groups/tiles.js",
 					], function (tiles) {
 						require([
-							"mmg-core/defaults/unit-groups/ui.js",
+							"mmg/defaults/unit-groups/ui.js",
 						], function (ui) {
 							MMG.uGroups["actors"] = actors;
 							MMG.uGroups["doodads"] = doodads;
@@ -32,7 +32,7 @@ function INIT(){
 							MMG.uGroups["ui"] = ui;
 							for (var i = 0; i < CONF.units.groups.length; ++i) { DECLARE_UNIT_GROUP(CONF.units.groups[i]) };
 
-							require(["mmg-core/defaults/unit-types/shittyWizard.js"], function (data) {
+							require(["mmg/defaults/unit-types/shittyWizard.js"], function (data) {
 								MMG.uTypes["shittyWizard"] = data;
 								for (var i = 0; i < CONF.units.types.length; ++i) { DECLARE_UNIT_TYPE(CONF.units.types[i]) };
 

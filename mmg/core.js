@@ -1,4 +1,4 @@
-var UNV = {};
+var GLOBALS = {};
 var BUFFS = {};
 var SOCKET = null;
 var USER = null;
@@ -37,6 +37,21 @@ MMG.loadScene = function(name){
 	MMG.nextScene.name = name;
 	MMG.nextScene.func = function () {
 		if (MMG.scenes[name] != undefined){
+			if (SOCKET != null){
+				var socket_keys = Object.keys(SOCKET._callbacks);
+				var reserved_listeners = ["connecting", "connect", "error", "connect_error", "connect_timeout", "disconnect"]
+				for (var i = 0; i < socket_keys.length; ++i) {
+					var p = socket_keys[i].split("$").join("");
+					var is_reserved = false;
+					for (var i2 = 0; i2 < reserved_listeners.length; ++i2) {
+						var p2 = reserved_listeners[i2];
+						if (p == p2){is_reserved = true}
+					}
+
+					if (!is_reserved){SOCKET.off(p)}
+				}
+			}
+
 			document.body.innerHTML = "";
 
 			MMG.iterator.cps = 0;

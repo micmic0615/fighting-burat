@@ -1,6 +1,5 @@
 define(function () {return function(){
 	var turn = this.turn;
-	var combat = this.combat;
 	var player = this.player;
 
 	var icons = this.icons;
@@ -25,7 +24,7 @@ define(function () {return function(){
 		zIndex: 100
 	});
 	
-	var enemy = this.newUnit("main", "demon", {
+	var enemy = this.newUnit("main", "knight", {
 		alias:'enemy',
 		locX:(this.getScreen().width/4)*3,
 		locY:245,
@@ -35,7 +34,7 @@ define(function () {return function(){
 
 	generate_icons.bind(this)();
 	
-	while(player.buffs_current.length < combat.buffs_max + combat.buffs_foresight){
+	while(player.buffs_current.length < COMBAT.buffs_max + COMBAT.buffs_foresight){
 		this.buff_shuffle("init")
 	}
 
@@ -44,7 +43,7 @@ define(function () {return function(){
 	}
 
 	function generate_icons(){
-		for (var i = 0; i < combat.buffs_max; ++i) {
+		for (var i = 0; i < COMBAT.buffs_max; ++i) {
 			icons["buffs_" + i] = this.newUnit("ui", "buff_icons", {
 				alias:"buffs_" + i, clickable: true, freeSize: true, anchored: true,
 				locX: 10 + ( i * ( 95 ) ),
@@ -61,10 +60,10 @@ define(function () {return function(){
 
 		texts["mana_value"] = this.drawFloatingText("000", "#fff", "15px Arial", 1, this.getScreen().width/2, this.getScreen().height - 12, {});
 
-		for (var i = 0; i < combat.buffs_foresight; ++i) {
+		for (var i = 0; i < COMBAT.buffs_foresight; ++i) {
 			icons["nextbuffs_" + i] = this.newUnit("ui", "buff_icons", {
 				alias:"nextbuffs_" + i, clickable: false, freeSize: true, anchored: true,
-				locX: (15 + ( combat.buffs_max * ( 95 ) )) + i * 40,
+				locX: (15 + ( COMBAT.buffs_max * ( 95 ) )) + i * 40,
 				locY: this.getScreen().height - 70,
 				width:40,
 				height:40,
@@ -88,7 +87,7 @@ define(function () {return function(){
 
 		
 
-		for (var i = 0; i < combat.buffs_use_max; ++i) {
+		for (var i = 0; i < COMBAT.buffs_use_max; ++i) {
 			icons["usedbuffs_" + i] = this.newUnit("ui", "buff_icons", {
 				alias:"usedbuffs_" + i, clickable: false, freeSize: true, anchored: true,
 				locX: (this.getScreen().width - 85) - (i * 35),
@@ -141,7 +140,7 @@ define(function () {return function(){
 			bars["speed_" + i] = this.drawRect((((300 + 2)/(turn.sequence_max - 1))*i + pBars_locX + 10), 31, ((300 - (turn.sequence_max - 1)*2) /(turn.sequence_max - 1)), 4, 1, "#3c6", "", {});		
 		}
 
-		for (var i = 0; i < combat.blocks_max; ++i) {
+		for (var i = 0; i < COMBAT.blocks_max; ++i) {
 			bars["block_" + i] = this.drawRect((pBars_locX + 10) + 17*i, 40, 12, 12, 0.25, "#09f", "", {});
 		}
 
@@ -171,7 +170,7 @@ define(function () {return function(){
 		} 
 
 		if (turn.phase <= 0 || turn.phase <= 2){
-			for (var i = 0; i < combat.buffs_max; ++i) {
+			for (var i = 0; i < COMBAT.buffs_max; ++i) {
 				if (player.buffs_current.length > 0){var p = player.buffs_current[i]} else {var p = "_empty"};
 				
 				icons["buffs_" + i].setAnimation(p);
@@ -196,8 +195,8 @@ define(function () {return function(){
 				}
 			}
 
-			for (var i = 0; i < combat.buffs_foresight; ++i) {
-				var p = player.buffs_current[i + combat.buffs_max];
+			for (var i = 0; i < COMBAT.buffs_foresight; ++i) {
+				var p = player.buffs_current[i + COMBAT.buffs_max];
 				icons["nextbuffs_" + i].setAnimation(p)
 			}
 
@@ -217,7 +216,7 @@ define(function () {return function(){
 
 			texts["shuffle" ].text = String(shuffle_cost)
 
-			for (var i = 0; i < combat.buffs_use_max ; ++i) {
+			for (var i = 0; i < COMBAT.buffs_use_max ; ++i) {
 				if (i < hero.buffs.length){
 					var p = hero.buffs[i];
 					
@@ -281,7 +280,7 @@ define(function () {return function(){
 
 		texts["mana_value"].text = Math.floor(player.mana_current)
 
-		for (var i = 0; i < combat.blocks_max; ++i) {
+		for (var i = 0; i < COMBAT.blocks_max; ++i) {
 			var p = bars["block_" + i];
 			if (hero.current.block > i){p.opacity = 1;} else {p.opacity = 0.35}
 		}

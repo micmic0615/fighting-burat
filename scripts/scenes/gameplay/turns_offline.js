@@ -8,6 +8,7 @@ define(function () { return function(){
 		var unit = this.getUnit(alias);
 
 		this.fighters[alias] = {
+			agility: unit.derived.agility,
 			health_max: unit.derived.health,
 			stamina_max: unit.derived.stamina,
 			defense_max: unit.derived.defense,
@@ -112,7 +113,7 @@ define(function () { return function(){
 
 		for (var i = 0; i < keys.length; ++i) {
 			var p = keys[i];
-			var unit = this.getUnit(p).derived.clone();
+			var unit = this.fighters[p]
 
 			unit._agi = { factor: 1, total: 0, actions: 0 };
 
@@ -216,7 +217,7 @@ define(function () { return function(){
 					if (p.duration > 0) { next_unit.debuffs[i].duration-- } else { next_unit.debuffs.splice(i, 1); i-- }
 				}
 
-				var stamina_regen = this.fighters[b].stamina_max * this.combat.stamina_regen_factor;
+				var stamina_regen = this.fighters[b].stamina_max * COMBAT.stamina_regen_factor;
 
 				for (var i = 0; i < next_unit.staminaregen.length; ++i) {
 					var p = next_unit.staminaregen[i];
@@ -278,7 +279,7 @@ define(function () { return function(){
 				};
 
 				if (buff_effects[b]["blocks_add"] > 0) {
-					if (next_unit.block + buff_effects[b]["blocks_add"] >= this.combat.blocks_max) {next_unit.block = this.combat.blocks_max} 
+					if (next_unit.block + buff_effects[b]["blocks_add"] >= COMBAT.blocks_max) {next_unit.block = COMBAT.blocks_max} 
 					else {next_unit.block += buff_effects[b]["blocks_add"]};
 				};
 
@@ -339,7 +340,7 @@ define(function () { return function(){
 			
 				switch(this.turn.phase){
 					case -1:
-						if (Math.abs(origin.locX - target.locX) < this.combat.attack_distance){change_turn_phase.bind(this)()} else {origin.walk_forward(); target.walk_forward()};
+						if (Math.abs(origin.locX - target.locX) < COMBAT.attack_distance){change_turn_phase.bind(this)()} else {origin.walk_forward(); target.walk_forward()};
 						break
 					case 0: 						
 						origin.set_stats(current.unit_stats[current.origin]);
@@ -357,7 +358,7 @@ define(function () { return function(){
 							case "attack":
 								var next_origin = this.getUnit(next_turn.origin);
 								var next_target = this.getUnit(next_turn.target);
-								if (Math.abs(next_origin.locX - next_target.locX) > this.combat.attack_distance){next_origin.face_location(next_target.locX); next_origin.walk_forward()} else {change_turn_phase.bind(this)()};								
+								if (Math.abs(next_origin.locX - next_target.locX) > COMBAT.attack_distance){next_origin.face_location(next_target.locX); next_origin.walk_forward()} else {change_turn_phase.bind(this)()};								
 								break
 							
 							case "cast":

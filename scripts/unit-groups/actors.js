@@ -1,6 +1,7 @@
 define(function () {var THIS_UNIT = function(){
-	this.prop("state.alive", true);
-	this.prop("state.flying", false);
+	this.prop("hidden", false);
+	this.prop("alive", true);
+	this.prop("flying", false);
 
 	this.prop("primary.vig", 1);
 	this.prop("primary.end", 1);
@@ -54,11 +55,13 @@ THIS_UNIT.prototype.birth = function(){
 	this.prop("current.defense", this.derived.defense);
 	this.prop("current.block", 0);
 
-	this.prop("bars.hp_max", MMG.stage.drawRect(this.locX, 175, 80, 5, 1, "#600", "", {}));
-	this.prop("bars.hp_current", MMG.stage.drawRect(this.locX, 175, 80, 5, 1, "#f00", "", {}));
-	
-	this.prop("bars.def_max", MMG.stage.drawRect(this.locX, 182, 80, 3, 1, "#036", "", {}));
-	this.prop("bars.def_current", MMG.stage.drawRect(this.locX, 182, 80, 3, 1, "#09f", "", {}));
+	if (!this.hidden){
+		this.prop("bars.hp_max", MMG.stage.drawRect(this.locX, 175, 80, 5, 1, "#600", "", {}));
+		this.prop("bars.hp_current", MMG.stage.drawRect(this.locX, 175, 80, 5, 1, "#f00", "", {}));
+		
+		this.prop("bars.def_max", MMG.stage.drawRect(this.locX, 182, 80, 3, 1, "#036", "", {}));
+		this.prop("bars.def_current", MMG.stage.drawRect(this.locX, 182, 80, 3, 1, "#09f", "", {}));
+	}
 
 	// this.prop("bars.stm_max", MMG.stage.drawRect(this.locX, 189, 80, 3, 1, "#052", "", {}));
 	// this.prop("bars.stm_current", MMG.stage.drawRect(this.locX, 189, 80, 3, 1, "#0d6", "", {}));
@@ -76,7 +79,7 @@ THIS_UNIT.prototype.update_stats = function(){
 
 	var weightRatio = this.derived.equip_load / this.derived.equip_max;
 	this.prop("derived.agility", 100 - Math.round(weightRatio * 100));
-	this.prop("derived.movespeed", MMG.stage.combat.unit_movespeed);
+	this.prop("derived.movespeed", COMBAT.unit_movespeed);
 
 	this.prop("derived.poise", this.gear.head.poise + this.gear.torso.poise + this.gear.arms.poise + this.gear.legs.poise);
 	this.prop("derived.force", this.gear.weapon.force);
@@ -165,7 +168,7 @@ THIS_UNIT.prototype.set_stats = function(stats){
 	for (var i = 0; i < this.staminaregen.length; ++i) {
 		var p = this.staminaregen[i];
 
-		var stamina_regen = MMG.stage.combat.stamina_regen_factor*this.derived.stamina
+		var stamina_regen = COMBAT.stamina_regen_factor*this.derived.stamina
 
 		if (stamina_regen + this.current.stamina >= this.derived.stamina){
 			var total_heal = this.derived.stamina - this.current.stamina
@@ -223,20 +226,22 @@ THIS_UNIT.prototype.stop = function(){
 }
 
 THIS_UNIT.prototype.always = function(){
-	if (MMG.stage == undefined) return null;
+	if (!this.hidden){
+		if (MMG.stage == undefined) return null;
 
-	this.bars.hp_max.x = this.locX - 40;
-	this.bars.def_max.x = this.locX - 40;
+		this.bars.hp_max.x = this.locX - 40;
+		this.bars.def_max.x = this.locX - 40;
 
-	this.bars.hp_current.x = this.locX - 40;
-	this.bars.def_current.x = this.locX - 40;
+		this.bars.hp_current.x = this.locX - 40;
+		this.bars.def_current.x = this.locX - 40;
 
-	var this_health = Math.round(80 * (this.current.health / this.derived.health));
-	var this_defense = Math.round(80 * (this.current.defense / this.derived.defense));
-	var this_stamina = Math.round(80 * (this.current.stamina / this.derived.stamina));
+		var this_health = Math.round(80 * (this.current.health / this.derived.health));
+		var this_defense = Math.round(80 * (this.current.defense / this.derived.defense));
+		var this_stamina = Math.round(80 * (this.current.stamina / this.derived.stamina));
 
-	MMG.stage.update_bars(this.bars.hp_current, this_health, 1);
-	MMG.stage.update_bars(this.bars.def_current, this_defense, 1);
+		MMG.stage.update_bars(this.bars.hp_current, this_health, 1);
+		MMG.stage.update_bars(this.bars.def_current, this_defense, 1);
+	}
 }
 
 //ACTIONS
@@ -340,14 +345,14 @@ THIS_UNIT.prototype.cast = function(target, turn_data){
 	var listener = {origin: false, target: false};
 	if (this.action != "cast"){
 		this.action = "cast";
-		this.temp.cast_time = MMG.stage.combat.cast_time_duration;
-		this.temp.channel_time = MMG.stage.combat.cast_channel_duration;
+		this.temp.cast_time = COMBAT.cast_time_duration;
+		this.temp.channel_time = COMBAT.cast_channel_duration;
 		
 		this.setAnimation("counter");
 		
 	} else {
 		if (this.temp.channel_time > 0){
-			target.walk_backwards(MMG.stage.combat.cast_repel_factor)
+			target.walk_backwards(COMBAT.cast_repel_factor)
 		} 
 
 		if (this.temp.cast_time > 0){
@@ -357,7 +362,7 @@ THIS_UNIT.prototype.cast = function(target, turn_data){
 			if (this.temp.channel_time > 0){
 				this.temp.channel_time--
 			} else {
-				this.staminaregen.push(MMG.stage.combat.stamina_regen_duration);
+				this.staminaregen.push(COMBAT.stamina_regen_duration);
 
 				MMG.stage.drawFlyingText("+BRV!", "#f60", "18px Arial", 100, this.locX, this.locY - 10, 270);
 
@@ -381,13 +386,13 @@ THIS_UNIT.prototype.flinch = function(origin, turn_data){
 		this.action = "flinch";
 		this.temp.guard_hold = 15;
 		
-		this.temp.flinch_hold = Math.round(( turn_data.force / turn_data.poise ) * MMG.stage.combat.flinch_push_duration) + MMG.stage.combat.flinch_push_base;
-		this.temp.flinch_movement = MMG.stage.combat.flinch_push_movement;
+		this.temp.flinch_hold = Math.round(( turn_data.force / turn_data.poise ) * COMBAT.flinch_push_duration) + COMBAT.flinch_push_base;
+		this.temp.flinch_movement = COMBAT.flinch_push_movement;
 
-		if (this.temp.flinch_hold > MMG.stage.combat.flinch_push_max_duration){
-			var push_move_multiplier =  this.temp.flinch_hold / MMG.stage.combat.flinch_push_max_duration;
+		if (this.temp.flinch_hold > COMBAT.flinch_push_max_duration){
+			var push_move_multiplier =  this.temp.flinch_hold / COMBAT.flinch_push_max_duration;
 			this.temp.flinch_movement *= push_move_multiplier;
-			this.temp.flinch_hold = MMG.stage.combat.flinch_push_max_duration;
+			this.temp.flinch_hold = COMBAT.flinch_push_max_duration;
 		}
 	} else {
 		if (this.current.block > 0){
@@ -416,10 +421,10 @@ THIS_UNIT.prototype.flinch = function(origin, turn_data){
 
 				if (this.current.block > 0){total_push /= 2}
 
-				if (this.locX + total_push <= MMG.stage.combat.margin){
-					this.locX = MMG.stage.combat.margin
-				} else if (this.locX + total_push >= MMG.stage.world.width - MMG.stage.combat.margin){
-					this.locX = MMG.stage.world.width - MMG.stage.combat.margin
+				if (this.locX + total_push <= COMBAT.margin){
+					this.locX = COMBAT.margin
+				} else if (this.locX + total_push >= MMG.stage.world.width - COMBAT.margin){
+					this.locX = MMG.stage.world.width - COMBAT.margin
 				} else {
 					this.locX += total_push;
 				}
@@ -445,10 +450,10 @@ THIS_UNIT.prototype.walk_forward = function(fixed){
 		if (fixed == undefined) { speed = this.derived.movespeed } else { speed = fixed };
 		var movement = speed * direction
 
-		if (this.locX + movement <= MMG.stage.combat.margin){
-			this.moveTo(MMG.stage.combat.margin, this.locY);
-		} else if (this.locX + movement >= MMG.stage.world.width - MMG.stage.combat.margin){
-			this.moveTo(MMG.stage.world.width - MMG.stage.combat.margin, this.locY);
+		if (this.locX + movement <= COMBAT.margin){
+			this.moveTo(COMBAT.margin, this.locY);
+		} else if (this.locX + movement >= MMG.stage.world.width - COMBAT.margin){
+			this.moveTo(MMG.stage.world.width - COMBAT.margin, this.locY);
 		} else {
 			this.moveBy(movement, 0);
 		}
@@ -469,10 +474,10 @@ THIS_UNIT.prototype.walk_backwards = function(fixed){
 		if (fixed == undefined) { speed = this.derived.movespeed } else { speed = fixed };
 		var movement = speed * direction
 
-		if (this.locX + movement <= MMG.stage.combat.margin){
-			this.moveTo(MMG.stage.combat.margin, this.locY);
-		} else if (this.locX + movement >= MMG.stage.world.width - MMG.stage.combat.margin){
-			this.moveTo(MMG.stage.world.width - MMG.stage.combat.margin, this.locY);
+		if (this.locX + movement <= COMBAT.margin){
+			this.moveTo(COMBAT.margin, this.locY);
+		} else if (this.locX + movement >= MMG.stage.world.width - COMBAT.margin){
+			this.moveTo(MMG.stage.world.width - COMBAT.margin, this.locY);
 		} else {
 			this.moveBy(movement, 0);
 		}

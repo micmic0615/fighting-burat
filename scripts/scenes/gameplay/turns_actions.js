@@ -45,26 +45,26 @@ define(function () {return function(){
 
 		if (current.unit_stats[origin].locX > current.unit_stats[target].locX) { var push_direction = -1 } else { var push_direction = 1 };
 
-		var total_push = (Math.round(((this.fighters[origin].force + buff_effects[origin].force_add) / this.fighters[target].poise) * this.combat.flinch_push_duration) * push_direction * this.combat.flinch_push_movement) + (push_direction * this.combat.flinch_push_movement * this.combat.flinch_push_base);
+		var total_push = (Math.round(((this.fighters[origin].force + buff_effects[origin].force_add) / this.fighters[target].poise) * COMBAT.flinch_push_duration) * push_direction * COMBAT.flinch_push_movement) + (push_direction * COMBAT.flinch_push_movement * COMBAT.flinch_push_base);
 		total_push /= push_resist;
 
-		if (next.unit_stats[target].locX + total_push <= this.combat.margin) {
-			var knockback_damage = this.combat.margin - (next.unit_stats[target].locX + total_push);
-			next.unit_stats[target].locX = this.combat.margin;
-		} else if (next.unit_stats[target].locX + total_push >= this.world.width - this.combat.margin) {
-			var knockback_damage = (next.unit_stats[target].locX + total_push) - (this.world.width - this.combat.margin);
-			next.unit_stats[target].locX = this.world.width - this.combat.margin;
+		if (next.unit_stats[target].locX + total_push <= COMBAT.margin) {
+			var knockback_damage = COMBAT.margin - (next.unit_stats[target].locX + total_push);
+			next.unit_stats[target].locX = COMBAT.margin;
+		} else if (next.unit_stats[target].locX + total_push >= this.world.width - COMBAT.margin) {
+			var knockback_damage = (next.unit_stats[target].locX + total_push) - (this.world.width - COMBAT.margin);
+			next.unit_stats[target].locX = this.world.width - COMBAT.margin;
 		} else {
 			var knockback_damage = 0;
 			next.unit_stats[target].locX += total_push;
 		}
 
-		current.damage.target.health += knockback_damage * this.combat.knockback_damage_factor;
+		current.damage.target.health += knockback_damage * COMBAT.knockback_damage_factor;
 
 		if (damage_defense_spill > 0){current.damage.target.health *= defense_spill_factor};
 
-		if (Math.abs(current.unit_stats[origin].locX - current.unit_stats[target].locX) > this.combat.attack_distance) {
-			current.unit_stats[origin].locX = current.unit_stats[target].locX + push_direction * -1 * this.combat.attack_distance;
+		if (Math.abs(current.unit_stats[origin].locX - current.unit_stats[target].locX) > COMBAT.attack_distance) {
+			current.unit_stats[origin].locX = current.unit_stats[target].locX + push_direction * -1 * COMBAT.attack_distance;
 			next.unit_stats[origin].locX = current.unit_stats[origin].locX;
 		}
 
@@ -108,21 +108,21 @@ define(function () {return function(){
 		var origin = current.origin;
 		var target = current.target;
 		
-		next.unit_stats[origin].staminaregen.push(this.combat.stamina_regen_duration)
+		next.unit_stats[origin].staminaregen.push(COMBAT.stamina_regen_duration)
 
-		if (next.unit_stats[origin].block + 1 >= this.combat.blocks_max) {
-			next.unit_stats[origin].block = this.combat.blocks_max;
+		if (next.unit_stats[origin].block + 1 >= COMBAT.blocks_max) {
+			next.unit_stats[origin].block = COMBAT.blocks_max;
 		} else {
 			next.unit_stats[origin].block++;
 		}
 
 		if (current.unit_stats[origin].locX > current.unit_stats[target].locX) { var flee_direction = -1 } else { var flee_direction = 1 };
-		var total_flee = flee_direction * this.combat.cast_repel_factor * (this.combat.cast_time_duration + this.combat.cast_channel_duration);
+		var total_flee = flee_direction * COMBAT.cast_repel_factor * (COMBAT.cast_time_duration + COMBAT.cast_channel_duration);
 
-		if (next.unit_stats[target].locX + total_flee <= this.combat.margin) {
-			next.unit_stats[target].locX = this.combat.margin
-		} else if (next.unit_stats[target].locX + total_flee >= this.world.width - this.combat.margin) {
-			next.unit_stats[target].locX = this.world.width - this.combat.margin
+		if (next.unit_stats[target].locX + total_flee <= COMBAT.margin) {
+			next.unit_stats[target].locX = COMBAT.margin
+		} else if (next.unit_stats[target].locX + total_flee >= this.world.width - COMBAT.margin) {
+			next.unit_stats[target].locX = this.world.width - COMBAT.margin
 		} else {
 			next.unit_stats[target].locX += total_flee;
 		}

@@ -21,7 +21,8 @@ CONF.scenes = {
 		"gameplay",
 		"loader",
 		"menu",
-		"socket"
+		"socket",
+		"findmatch"
 	],
 
 	behaviors: [
@@ -52,6 +53,40 @@ CONF.units = {
 	],
 };
 
+var COMBAT = {
+	margin: 40,
+
+	flinch_push_base: 15,
+	flinch_push_duration: 15,
+	flinch_push_movement: 2,
+	flinch_push_max_duration: 30,
+
+	attack_distance: 90,
+
+	cast_time_duration: 10,
+	cast_channel_duration: 30,
+	cast_repel_factor: 2,
+
+	knockback_damage_factor: 1,
+
+	unit_movespeed: 2.5,
+
+	buffs_use_max: 10,
+
+	buffs_max: 4,
+	buffs_foresight:2,
+
+	stamina_regen_factor: 0.04,
+	stamina_regen_duration: 5,
+
+	bonus_buff_chance: 25,
+
+	blocks_max: 10,
+
+	debuff_proc_factor: 5,
+	debuff_proc_requirement: 20
+};
+
 var GEAR = {
 	arms: [],
 	head: [],
@@ -66,9 +101,9 @@ var DEBUG = {
 };
 
 var PATHS = {
-	SCENE: "mmg-objects/scenes/",
-	UNIT_GROUP: "mmg-objects/unit-groups/",
-	UNIT_TYPE: "mmg-objects/unit-types/",	
-	BEHAVIOR_SCENE: "mmg-objects/behaviors/scenes/",
-	BEHAVIOR_UNIT: "mmg-objects/behaviors/units/",
+	SCENE: "scripts/scenes/",
+	UNIT_GROUP: "scripts/unit-groups/",
+	UNIT_TYPE: "scripts/unit-types/",	
+	BEHAVIOR_SCENE: "scripts/behaviors/scenes/",
+	BEHAVIOR_UNIT: "scripts/behaviors/units/",
 };
