@@ -10,5 +10,9 @@ function socket_setup(hostname){
 		alert("you have been disconnected...")
 	});
 
+	console.log(socket_setup)
+
+	
+
 	return socket_setup
 }

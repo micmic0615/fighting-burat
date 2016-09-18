@@ -56,15 +56,12 @@ THIS_UNIT.prototype.birth = function(){
 	this.prop("current.block", 0);
 
 	if (!this.hidden){
-		this.prop("bars.hp_max", MMG.stage.drawRect(this.locX, 175, 80, 5, 1, "#600", "", {}));
-		this.prop("bars.hp_current", MMG.stage.drawRect(this.locX, 175, 80, 5, 1, "#f00", "", {}));
+		this.prop("bars.hp_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#600", }));
+		this.prop("bars.hp_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#f00", }));
 		
-		this.prop("bars.def_max", MMG.stage.drawRect(this.locX, 182, 80, 3, 1, "#036", "", {}));
-		this.prop("bars.def_current", MMG.stage.drawRect(this.locX, 182, 80, 3, 1, "#09f", "", {}));
+		this.prop("bars.def_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#036", }));
+		this.prop("bars.def_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#09f", }));
 	}
-
-	// this.prop("bars.stm_max", MMG.stage.drawRect(this.locX, 189, 80, 3, 1, "#052", "", {}));
-	// this.prop("bars.stm_current", MMG.stage.drawRect(this.locX, 189, 80, 3, 1, "#0d6", "", {}));
 };
 
 THIS_UNIT.prototype.update_stats = function(){
@@ -112,14 +109,14 @@ THIS_UNIT.prototype.set_stats = function(stats){
 
 				if (p.factor >= this.derived.health*0.1){
 					randomizer = 15;
-					var styler = "36px Arial"
+					var fontSize = 36;
 				} else {
-					var styler = "18px Arial"
+					var fontSize = 18;
 				}
 
 				this.current.health += total_heal
 
-				MMG.stage.drawFlyingText("+"+ total_heal + "!", "#3f6", styler, 100, this.locX, this.locY - 10, 255 + randomizer);
+				MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#3f6", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
 				break;
 			
 			case "stamina_heal_add":
@@ -131,16 +128,15 @@ THIS_UNIT.prototype.set_stats = function(stats){
 
 				if (p.factor >= this.derived.health*0.15){
 					randomizer = 15;
-					var styler = "18px Arial"
+					var fontSize = 18
 					var texter = "+BRV!"
 				} else {
-					var styler = "10px Arial"
+					var fontSize = 10
 					var texter = "+brv!"
 				}
 
-				this.current.stamina += total_heal
-
-				MMG.stage.drawFlyingText(texter, "#f60", styler, 100, this.locX, this.locY - 10,  255 + randomizer);
+				this.current.stamina += total_heal;
+				MMG.stage.drawObj("flyingText", {text: texter, color: "#f60", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10,  angle: 255 + randomizer});
 				break;
 
 			case "transmute_add":
@@ -152,14 +148,14 @@ THIS_UNIT.prototype.set_stats = function(stats){
 
 				if (p.factor >= this.derived.defense*0.1){
 					randomizer = 15;
-					var styler = "36px Arial"
+					var fontSize = 36;
 				} else {
-					var styler = "18px Arial"
+					var fontSize = 18;
 				}
 
 				this.current.defense += total_heal
 
-				MMG.stage.drawFlyingText("+"+ total_heal + "!", "#09f", styler, 100, this.locX, this.locY - 10, 255 + randomizer);
+				MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#09f", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
 				break;
 		}
 	}
@@ -173,16 +169,13 @@ THIS_UNIT.prototype.set_stats = function(stats){
 		if (stamina_regen + this.current.stamina >= this.derived.stamina){
 			var total_heal = this.derived.stamina - this.current.stamina
 		} else {
-			var total_heal = stamina_regen
+			var total_heal = stamina_regen;
 		}
 
-		this.current.stamina += total_heal
-
-		var styler = "6px Arial"
-		var texter = "+brv!"
+		this.current.stamina += total_heal;
 
 		var randomizer = Math.random()*90;
-		MMG.stage.drawFlyingText(texter, "#f60", styler, 100, this.locX, this.locY - 10,  225 + randomizer);
+		MMG.stage.drawObj("flyingText", {text: "+brv!", color: "#f60", fontSize: 6, life: 100, x: this.locX, y: this.locY - 10,  angle: 225 + randomizer});
 	}
 }
 
@@ -198,16 +191,20 @@ THIS_UNIT.prototype.take_damage = function(origin, damage_data){
 	var randomizer = Math.random()*45*push_direction + 15*push_direction;
 
 	if (damage_data.health >= damage_data.defense){
-		if (damage_data.health > 0){MMG.stage.drawFlyingText(damage_data.health + "!", "#f00", "24px Arial", 100, this.locX, this.locY, 270 + randomizer)};	
+		if (damage_data.health > 0){
+			MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: 24, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer});
+			randomizer+=  20*push_direction;
+			MMG.stage.drawObj("flyingText", {text: damage_data.defense + "!", color: "#09f", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer})
+		};	
 	} else {
-		if (damage_data.health > 0){MMG.stage.drawFlyingText(damage_data.health + "!", "#f00", "18px Arial", 100, this.locX, this.locY, 270 + randomizer )};
+		if (damage_data.health > 0){MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})};
 		randomizer+=  20*push_direction;
 
-		if (damage_data.defense > 0){MMG.stage.drawFlyingText(damage_data.defense + "!", "#09f", "24px Arial", 100, this.locX, this.locY, 270 + randomizer)};	
+		if (damage_data.defense > 0){MMG.stage.drawObj("flyingText", {text: damage_data.defense + "!", color: "#09f", fontSize: 24, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})};	
 		randomizer+=  20*push_direction;
 	}
 
-	if (damage_data.stamina > 0){MMG.stage.drawFlyingText("-brv!", "#27595c", "12px Arial", 100, this.locX, this.locY, 270 + randomizer)}
+	if (damage_data.stamina > 0){MMG.stage.drawObj("flyingText", {text: "-brv!", color: "#27595c", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})}
 }
 
 
@@ -228,7 +225,6 @@ THIS_UNIT.prototype.stop = function(){
 THIS_UNIT.prototype.always = function(){
 	if (!this.hidden){
 		if (MMG.stage == undefined) return null;
-
 		this.bars.hp_max.x = this.locX - 40;
 		this.bars.def_max.x = this.locX - 40;
 
@@ -241,6 +237,11 @@ THIS_UNIT.prototype.always = function(){
 
 		MMG.stage.update_bars(this.bars.hp_current, this_health, 1);
 		MMG.stage.update_bars(this.bars.def_current, this_defense, 1);
+	} else {
+		this.bars.hp_max.opacity = 0;
+		this.bars.def_max.opacity = 0;
+		this.bars.hp_current.opacity = 0;
+		this.bars.def_current.opacity = 0;
 	}
 }
 
@@ -284,11 +285,10 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 						var total_heal = turn_data.damage.origin.leech_health
 					}
 
-					var randomizer = 15;
-					var styler = "18px Arial";	
+					var randomizer = 15;	
 					this.current.health += total_heal
 
-					MMG.stage.drawFlyingText("+"+ total_heal + "!", "#3f6", styler, 100, this.locX, this.locY - 10, 255 + randomizer);
+					MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#3f6", fontSize: 18, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
 				}
 			};
 			listener.origin = true;
@@ -364,7 +364,7 @@ THIS_UNIT.prototype.cast = function(target, turn_data){
 			} else {
 				this.staminaregen.push(COMBAT.stamina_regen_duration);
 
-				MMG.stage.drawFlyingText("+BRV!", "#f60", "18px Arial", 100, this.locX, this.locY - 10, 270);
+				MMG.stage.drawObj("flyingText", {text: "+BRV!", color: "#f60", fontSize: 18, life: 100, x: this.locX, y: this.locY - 10, angle: 270});
 
 				listener = {origin: true, target: true};
 

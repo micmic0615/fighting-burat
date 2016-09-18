@@ -6,11 +6,21 @@ define(function () { return function(){
 
 	SOCKET.on("res.game_extend", function(res){
 		GLOBALS.turn_data = res;
-	});
+	}.bind(this));
 
 	SOCKET.on("res.game_buff_eval", function(res){
-		GLOBALS.turn_data = res;
-	});
+		this.turn.index = res.index;
+		GLOBALS.turn_data = res.turn_data;
+	}.bind(this));
+
+	SOCKET.on("res.game_end", function(res){
+		SOCKET.emit("req.game_disconnect", GLOBALS.game_id);
+		delete GLOBALS.game_id;
+		delete GLOBALS.winner_id;
+		delete GLOBALS.turn_data;
+		delete GLOBALS.match_players;
+		MMG.loadScene("menu");
+	}.bind(this));
 
 	function initialize_stats(alias, locX){
 		var unit = this.getUnit(alias);
@@ -64,77 +74,80 @@ define(function () { return function(){
 
 	function run_turns(){
 		if (MMG.stage == undefined) return null;
-		
-		if (!game_over){
-			var current = GLOBALS.turn_data[this.turn.index];
-			var next_turn = GLOBALS.turn_data[this.turn.index + 1];
 
-			var origin = this.getUnit(current.origin);
-			var target = this.getUnit(current.target);
+		if (GLOBALS.turn_data.length > 0){
+			if (!game_over){
+				var current = GLOBALS.turn_data[this.turn.index];
+				var next_turn = GLOBALS.turn_data[this.turn.index + 1];
 
-		
-			switch(this.turn.phase){
-				case -1:
-					if (Math.abs(origin.locX - target.locX) < COMBAT.attack_distance){change_turn_phase.bind(this)()} else {origin.walk_forward(); target.walk_forward()};
-					break
-				case 0: 						
-					origin.set_stats(current.unit_stats[current.origin]);
-					target.set_stats(current.unit_stats[current.target]);
-					change_turn_phase.bind(this)();
-					break;
+				var origin = this.getUnit(current.origin);
+				var target = this.getUnit(current.target);
 
-				case 1:
-					var listener = origin[current.action](target, current);
-					if (listener.origin && listener.target){change_turn_phase.bind(this)()};
-					break;
+			
+				switch(this.turn.phase){
+					case -1:
+						if (Math.abs(origin.locX - target.locX) < COMBAT.attack_distance){change_turn_phase.bind(this)()} else {origin.walk_forward(); target.walk_forward()};
+						break
+					case 0: 						
+						origin.set_stats(current.unit_stats[current.origin]);
+						target.set_stats(current.unit_stats[current.target]);
+						change_turn_phase.bind(this)();
+						break;
 
-				case 2:
-					switch(next_turn.action){
-						case "attack":
-							var next_origin = this.getUnit(next_turn.origin);
-							var next_target = this.getUnit(next_turn.target);
-							if (Math.abs(next_origin.locX - next_target.locX) > COMBAT.attack_distance){next_origin.face_location(next_target.locX); next_origin.walk_forward()} else {change_turn_phase.bind(this)()};								
-							break
-						
-						case "cast":
-						case "skip":
-							change_turn_phase.bind(this)();
-							break
-					}
-					break
+					case 1:
+						var listener = origin[current.action](target, current);
+						if (listener.origin && listener.target){change_turn_phase.bind(this)()};
+						break;
 
-				case 3:
-					if (this.getUnit(GLOBALS.my_fighter).prebuffs.length > 0){
-						SOCKET.emit("req.game_buff_eval", {game_id: GLOBALS.game_id, game_index: this.turn.index, user_id: USER._id, prebuffs: this.getUnit(GLOBALS.my_fighter).prebuffs});
-						this.getUnit(GLOBALS.my_fighter).prebuffs = [];
-					};
+					case 2:
+						switch(next_turn.action){
+							case "attack":
+								var next_origin = this.getUnit(next_turn.origin);
+								var next_target = this.getUnit(next_turn.target);
+								if (Math.abs(next_origin.locX - next_target.locX) > COMBAT.attack_distance){next_origin.face_location(next_target.locX); next_origin.walk_forward()} else {change_turn_phase.bind(this)()};								
+								break
+							
+							case "cast":
+							case "skip":
+								change_turn_phase.bind(this)();
+								break
+						}
+						break
 
-					change_turn_phase.bind(this)();
-					break;
-			};
-		} else {
-			if (game_over_delay > 0){
-				if (game_over_delay == 100){
-					var hero = MMG.stage.getUnit("hero");
-					var enemy = MMG.stage.getUnit("enemy");
+					case 3:
+						if (this.getUnit(GLOBALS.my_fighter).prebuffs.length > 0){
+							SOCKET.emit("req.game_buff_eval", {game_id: GLOBALS.game_id, game_index: this.turn.index, user_id: USER._id, prebuffs: this.getUnit(GLOBALS.my_fighter).prebuffs});
+							this.getUnit(GLOBALS.my_fighter).prebuffs = [];
+						};
 
-					if (GLOBALS.my_fighter == "hero"){
-						if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU LOSE"};
-						if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU WIN"};
-					} else {
-						if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU WIN"};
-						if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU LOSE"};
-					}
-
-					this.drawFlyingText(message, "#000", "54px Arial", 100, MMG.resolution.width/2, MMG.resolution.height/2 + 50, 270);
-				}		
-
-				game_over_delay--;
+						change_turn_phase.bind(this)();
+						break;
+				};
 			} else {
-				MMG.loadScene("menu");
+				if (game_over_delay > 0){
+					if (game_over_delay == 100){
+						var hero = MMG.stage.getUnit("hero");
+						var enemy = MMG.stage.getUnit("enemy");
+
+						if (GLOBALS.my_fighter == "hero"){
+							if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU LOSE"};
+							if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU WIN"; GLOBALS.winner_id = USER._id};
+						} else {
+							if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU WIN"; GLOBALS.winner_id = USER._id};
+							if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU LOSE"};
+						}
+
+						this.drawObj("flyingText", {text: message, color:"#000", fontSize: 54, life:100, x: MMG.resolution.width/2, y: MMG.resolution.height/2 + 50, angle: 270});
+					}		
+
+					game_over_delay--;
+				} else {
+					SOCKET.emit("req.game_end", {game_id: GLOBALS.game_id, winner_id: GLOBALS.winner_id});
+				}
 			}
+		} else {
+			SOCKET.emit("req.game_extend", {game_id: GLOBALS.game_id, game_index: this.turn.index});
 		}
-		
 	};
 	
 

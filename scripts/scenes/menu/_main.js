@@ -9,11 +9,8 @@ define(function () {return function(SCENE){
 	var icons_top = 10;
 	var icons_size = 60;
 	var icons_row_max = 5;
-
 	
 	var select_min = 3;
-
-
 
 	var buffs_selected = {
 		0:{items:[], max:4, color:"#f00"},
@@ -29,8 +26,14 @@ define(function () {return function(SCENE){
 	var selected_alias = "";
 	var selected_index = "";
 
-
-	var selector = SCENE.drawRect(0 - icons_size, 0 - icons_size, icons_size, icons_size, 0.5, "#ff0", "", {});
+	var selector = SCENE.drawObj("rect",  {
+		x: 0 - icons_size, 
+		y: 0 - icons_size, 
+		width: icons_size, 
+		height: icons_size, 
+		opacity: 0.5, 
+		backgroundColor: "#ff0"
+	});
 
 	for (var i = 0; i < buff_keys.length; ++i) {
 		var p = buff_keys[i];
@@ -44,16 +47,14 @@ define(function () {return function(SCENE){
 				height: icons_size,
 			});
 
-			SCENE.bars["buffs" + p] = SCENE.drawRect(
-				icons_size - 13 + ((i * ((icons_size + 5))) - (((icons_size + 5) * icons_row_max) * Math.floor(i / icons_row_max))),
-				(icons_top - 2) + (icons_size + 5) * Math.floor(i / icons_row_max),
-				icons_size*0.2, 
-				icons_size*0.2, 
-				0.75, 
-				buffs_selected[BUFFS[p].slot].color,
-				"",
-				{}
-			);
+			SCENE.bars["buffs" + p] = SCENE.drawObj("rect",{
+				x: icons_size - 13 + ((i * ((icons_size + 5))) - (((icons_size + 5) * icons_row_max) * Math.floor(i / icons_row_max))),
+				y: (icons_top - 2) + (icons_size + 5) * Math.floor(i / icons_row_max),
+				width: icons_size*0.2, 
+				height: icons_size*0.2, 
+				opacity: 0.75, 
+				backgroundColor: buffs_selected[BUFFS[p].slot].color
+			});
 
 			SCENE.icons["buffs_" + p].clicked = select_buff;
 
@@ -61,10 +62,19 @@ define(function () {return function(SCENE){
 			
 	};
 
+	
+
 	for (var u = 0; u < 5; ++u) {
 		var b = buffs_selected[u];
 		for (var i = 0; i < b.max; ++i) {		
-			SCENE.bars["buff_slot_" + u + "_" + i] = SCENE.drawRect(SCENE.world.width - (icons_size + 5) - (i * ((icons_size + 5))), 5 + (icons_size + 5) * u, icons_size, icons_size, 0.5, b.color, "", {});
+			SCENE.bars["buff_slot_" + u + "_" + i] = SCENE.drawObj("rect", {
+				x: SCENE.world.width - (icons_size + 5) - (i * ((icons_size + 5))), 
+				y: 5 + (icons_size + 5) * u, 
+				width: icons_size, 
+				height: icons_size,
+				opacity: 0.5, 
+				backgroundColor: b.color
+			});
 		};
 
 		for (var i = 0; i < b.max; ++i) {
@@ -82,11 +92,41 @@ define(function () {return function(SCENE){
 		};
 	};
 
-	
-	var buff_title = SCENE.drawFloatingText("", "#fff", "18px Arial", 1, 10, SCENE.world.height - 100, {});
-	var buff_tooltip = SCENE.drawFloatingText("", "#fff", "14px Arial", 1, 10, SCENE.world.height - 80, {});
+	SCENE.drawObj("floatingText", {
+		text: "Hello ", 
+		color: "#fff", 
+		fontSize: 34,
+		fontFamily: "Arial",
+		x: 10, 
+		y: SCENE.world.height - 160
+	});
 
-	
+	SCENE.drawObj("floatingText", {
+		text: USER.name, 
+		color: "#f00", 
+		fontSize: 34,
+		fontFamily: "Arial",
+		x: 100, 
+		y: SCENE.world.height - 160
+	});
+
+	var buff_title = SCENE.drawObj("floatingText", {
+		text: "", 
+		color: "#fff", 
+		fontSize: 18,
+		fontFamily: "Arial",
+		x: 10, 
+		y: SCENE.world.height - 105
+	});
+
+	var buff_tooltip = SCENE.drawObj("floatingText", {
+		text: "", 
+		color: "#fff",
+		fontSize: 18,
+		fontFamily: "Arial",
+		x: 10, 
+		y: SCENE.world.height - 80
+	});
 
 	// var BTN_DETAILS = SCENE.newUnit("ui", "menu", {
 	// 	alias: "BTN_DETAILS", clickable: true, freeSize: true, anchored: true,
@@ -131,17 +171,16 @@ define(function () {return function(SCENE){
 	function select_buff(){
 		var alias = this.alias.split("buffs_").join("");
 		
-		buff_title.text = BUFFS[alias].title + " [" + BUFFS[alias].cost + "]"
-		buff_tooltip.text = BUFFS[alias].tooltip
-		if (alias != selected_alias){
-			selector.x = this.locX;
-			selector.y = this.locY;
+		buff_title.text = BUFFS[alias].title + " [" + BUFFS[alias].cost + "]";
+		buff_tooltip.text = BUFFS[alias].tooltip;
 
-			selected_alias = alias;
-			selected_index = this.id_num;
-		} else {
-			add_buff();
-		}
+		selector.x = this.locX;
+		selector.y = this.locY;
+
+		selected_alias = alias;
+		selected_index = this.id_num;
+
+		add_buff();
 	}
 	
 	function add_buff(){

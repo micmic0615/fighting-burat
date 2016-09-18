@@ -10,8 +10,8 @@ BUFFS.defense = {
 
 BUFFS.deflect = {
 	effects: "defense_dmg_reflect_add",
-	duration: 10,
-	factor: 80,
+	duration: 12,
+	factor: 120,
 	cost: 15,
 	slot: 1,
 	title: "DEFLECT",

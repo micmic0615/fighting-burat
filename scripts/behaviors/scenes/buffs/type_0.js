@@ -1,6 +1,6 @@
 BUFFS.agility = {
 	effects: "speed_up",
-	duration: 10,
+	duration: 15,
 	factor: 2,
 	cost: 25,
 	slot: 0,
@@ -11,7 +11,7 @@ BUFFS.agility = {
 BUFFS.armorbreak = {
 	effects: "defense_dmg_add",
 	duration: 15,
-	factor: 150,
+	factor: 160,
 	cost: 15,
 	slot: 0,
 	title: "ARMOR BREAK",
@@ -21,7 +21,7 @@ BUFFS.armorbreak = {
 BUFFS.damage = {
 	effects: "health_dmg_add",
 	duration: 15,
-	factor: 100,
+	factor: 80,
 	cost: 20,
 	slot: 0,
 	title: "ATTACK UP",
@@ -31,7 +31,7 @@ BUFFS.damage = {
 BUFFS.thorns = {
 	effects: "health_dmg_reflect_add",
 	duration: 12,
-	factor: 50,
+	factor: 60,
 	cost: 20,
 	slot: 0,
 	title: "THORNS",

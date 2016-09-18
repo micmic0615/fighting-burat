@@ -57,10 +57,10 @@ define(function () {return function(){
 
 			icons["buffs_" + i].clicked = click_icon.bind(this, "buffs_" + i);
 
-			texts["buffs_" + i] = this.drawFloatingText("", "#f0f", "16px Arial", 1, 15 + ( i * ( 95 ) ), this.getScreen().height - 105, {});
+			texts["buffs_" + i] = this.drawObj("floatingText",{text:"", color: "#f0f", fontSize: 16, x: 15 + ( i * ( 95 ) ), y: this.getScreen().height - 105});
 		}
 
-		texts["mana_value"] = this.drawFloatingText("000", "#fff", "15px Arial", 1, this.getScreen().width/2, this.getScreen().height - 12, {});
+		
 
 		for (var i = 0; i < COMBAT.buffs_foresight; ++i) {
 			icons["nextbuffs_" + i] = this.newUnit("ui", "buff_icons", {
@@ -85,7 +85,7 @@ define(function () {return function(){
 		icons["shuffle"].clicked = this.shuffle_buffs;
 		icons["shuffle"].setAnimation("shuffle");
 
-		texts["shuffle" ] = this.drawFloatingText("", "#f0f", "16px Arial", 1, this.getScreen().width - 90, this.getScreen().height - 100, {});
+		texts["shuffle" ] = this.drawObj("floatingText",{text:"", color: "#f0f", fontSize: 16, x: this.getScreen().width - 90, y: this.getScreen().height - 100});
 
 		
 
@@ -127,27 +127,25 @@ define(function () {return function(){
 		}	
 
 		var pBars_locX = 47; 
-		bars.aggro = this.drawRect(10, 10, pBars_locX - 5, pBars_locX - 5, 1, "f00", "", {});
+		bars.aggro = this.drawObj("rect", {x: 10, y: 10, width: pBars_locX - 5, height: pBars_locX - 5, backgroundColor: "f00"});
+		
+		
 
-		this.drawRect((pBars_locX + 10), 10, 300, 10, 1, "#600", "", {});
-		bars.current_health = this.drawRect((pBars_locX + 10), 10, 300, 10, 1, "#f00", "", {});
+		this.drawObj("rect", {x: (pBars_locX + 10), y: 10, width: 300, height: 13, backgroundColor: "#600"});
+		bars.current_health = this.drawObj("rect", {x: (pBars_locX + 10), y: 10, width: 300, height: 13, backgroundColor: "#f00"});
 
-		this.drawRect((pBars_locX + 10), 23, 300, 5, 1, "#036", "", {});
-		bars.current_defense = this.drawRect((pBars_locX + 10), 23, 300, 5, 1, "#09f", "", {});
-
-		var speed_meter = 0;
-
-		for (var i = 0; i < turn.sequence_max - 1; ++i) {
-			var p = turn.sequence[i];
-			bars["speed_" + i] = this.drawRect((((300 + 2)/(turn.sequence_max - 1))*i + pBars_locX + 10), 31, ((300 - (turn.sequence_max - 1)*2) /(turn.sequence_max - 1)), 4, 1, "#3c6", "", {});		
-		}
-
+		this.drawObj("rect", {x: (pBars_locX + 10), y: 26, width: 300, height: 7, backgroundColor: "#036"});
+		bars.current_defense = this.drawObj("rect", { x: (pBars_locX + 10), y: 26, width: 300, height: 7, backgroundColor: "#09f"});
+		
 		for (var i = 0; i < COMBAT.blocks_max; ++i) {
-			bars["block_" + i] = this.drawRect((pBars_locX + 10) + 17*i, 40, 12, 12, 0.25, "#09f", "", {});
+			bars["block_" + i] = this.drawObj("rect", { x: (pBars_locX + 10) + 20*i, y: 37, width: 15, height: 15, opacity: 0.25, backgroundColor: "#09f"});
 		}
 
-		this.drawRect(10, (this.getScreen().height - 25), (this.getScreen().width - 20), 15, 1, "#606", "", {});
-		bars.current_mana = this.drawRect(10, (this.getScreen().height - 25), 0, 15, 1, "#f0f", "", {});
+		
+
+		this.drawObj("rect", {x: 10, y: (this.getScreen().height - 25), width: (this.getScreen().width - 20), height: 15, backgroundColor: "#606"});
+		bars.current_mana = this.drawObj("rect", {x: 10, y: (this.getScreen().height - 25), width: 0, height: 15, backgroundColor: "#f0f"});
+		texts["mana_value"] = this.drawObj("floatingText",{text:"000", color: "#fff", fontSize: 15, x: this.getScreen().width/2, y: this.getScreen().height - 12});
 
 		var my_fighter_buffs = {}
 
@@ -162,6 +160,19 @@ define(function () {return function(){
 				opacity: 0
 			});
 		}
+
+		if (GLOBALS.match_players[0]._id == USER._id){
+			var hero_color = "#000";
+			var enemy_color = "#f00";
+		} else {
+			var hero_color = "#f00";
+			var enemy_color = "#000";
+		}
+
+		texts["hero_name"] = this.drawObj("floatingText",{text: GLOBALS.match_players[0].name, color: hero_color, fontSize: 12, x: this.getUnit("hero").locX , y: this.getUnit("hero").locY - 75, textAlign: "center"});
+		texts["enemy_name"] = this.drawObj("floatingText",{text: GLOBALS.match_players[1].name, color: enemy_color, fontSize: 12, x: this.getUnit("enemy").locX , y: this.getUnit("enemy").locY - 75, textAlign: "center"});
+
+		console.log(GLOBALS)
 	}
 
 	function update_always(){
@@ -170,6 +181,9 @@ define(function () {return function(){
 		} else if (player.reload == 0) {
 			MMG.loadScene("menu")
 		} 
+
+		texts["hero_name"].x = this.getUnit("hero").locX ;
+		texts["enemy_name"].x = this.getUnit("enemy").locX ;
 
 		if (turn.phase <= 0 || turn.phase <= 2){
 			for (var i = 0; i < COMBAT.buffs_max; ++i) {
@@ -230,45 +244,28 @@ define(function () {return function(){
 				}
 			}
 
-			if (turn.sequence.length > 0){
-				var speed_meter = 0;
-
-				for (var i = turn.index; i < turn.sequence_max + turn.index; ++i) {
-					var p = turn.sequence[i];
-					if (bars["speed_" + (i - turn.index)]) {bars["speed_" + (i - turn.index)].opacity = 0.25}
-					if (p.origin == GLOBALS.my_fighter){speed_meter++}
-				}
-
-				for (var i = 0; i < turn.sequence_max - 1; ++i) {
-					var p = turn.sequence[i];
-					if (i < speed_meter){
-						bars["speed_" + i].opacity = 1
-					}
-				}
-			}	
-
 			if (my_fighter.current.stamina > 90){
-				bars.aggro.color = "#f60";
+				bars.aggro.backgroundColor = "#f60";
 			} else if (my_fighter.current.stamina > 80){
-				bars.aggro.color = "#d67517";
+				bars.aggro.backgroundColor = "#d67517";
 			} else if (my_fighter.current.stamina > 70){
-				bars.aggro.color = "#948c3b";
+				bars.aggro.backgroundColor = "#948c3b";
 			} else if (my_fighter.current.stamina > 60){
-				bars.aggro.color = "#55a15c";
+				bars.aggro.backgroundColor = "#55a15c";
 			} else if (my_fighter.current.stamina > 50){
-				bars.aggro.color = "#319e6d";
+				bars.aggro.backgroundColor = "#319e6d";
 			} else if (my_fighter.current.stamina > 40){
-				bars.aggro.color = "#2e8766";
+				bars.aggro.backgroundColor = "#2e8766";
 			} else if (my_fighter.current.stamina > 30){
-				bars.aggro.color = "#2b6e60";
+				bars.aggro.backgroundColor = "#2b6e60";
 			} else if (my_fighter.current.stamina > 20){
-				bars.aggro.color = "#27595c";
+				bars.aggro.backgroundColor = "#27595c";
 			} else if (my_fighter.current.stamina > 10) {
-				bars.aggro.color = "#244752";
+				bars.aggro.backgroundColor = "#244752";
 			} else if (my_fighter.current.stamina > 0) {
-				bars.aggro.color = "#13262b";
+				bars.aggro.backgroundColor = "#13262b";
 			} else {
-				bars.aggro.color = "#020404";
+				bars.aggro.backgroundColor = "#020404";
 			}
 		}
 

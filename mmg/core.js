@@ -24,10 +24,11 @@ MMG.createCanvas = function(alias, insertBefore){
 	var cssText =  "width:100%; height:100%; position:absolute; top:0px; left:0px";
 
 	var canvas = document.createElement('canvas');
+	canvas.id = alias;
 	canvas.style.cssText  = cssText;
 	canvas.width = MMG.resolution.width;
 	canvas.height = MMG.resolution.height;
-	if (alias == "clicker"){canvas.getContext("2d")};
+	if (alias == "clicker"){canvas.getContext("2d"); canvas.setAttribute("tabIndex", "1")};
 	if (insertBefore == undefined){document.body.appendChild(canvas)} else {document.body.insertBefore(canvas, insertBefore)};
 	return canvas
 }
@@ -84,6 +85,22 @@ MMG.loadScene = function(name){
 					}
 				}	
 			});
+
+			MMG.clickListener.focus();
+			MMG.clickListener.addEventListener('keydown',function(e){if (KEYS.on){
+				if (e.keyCode == 16){KEYS.shift = true};
+				if (e.keyCode == 32){KEYS.text += " "};
+				if (e.keyCode >= 48 && e.keyCode <= 57){ KEYS.text += KEYS.map[e.keyCode]};
+				if (e.keyCode >= 65 && e.keyCode <= 90){ if (KEYS.shift){KEYS.text += KEYS.map[e.keyCode].toUpperCase()} else {KEYS.text += KEYS.map[e.keyCode].toLowerCase()}};
+				
+				if (e.keyCode == 8){KEYS.text = KEYS.text.substring(0, KEYS.text.length - 1)};
+				
+				KEYS.press(KEYS.map[e.keyCode]);				
+			}},false);
+
+			MMG.clickListener.addEventListener('keyup',function(e){if (KEYS.on){
+				if (e.keyCode == 16){KEYS.shift = false};
+			}},false);
 
 			return true
 		} else {
@@ -205,56 +222,90 @@ MMG.render = function(){
 			var drawCtx = MMG.drawCanvas.getContext('2d');
 			drawCtx.clearRect(0,0,MMG.drawCanvas.width,MMG.drawCanvas.height);
 
-			for (var i = 0; i < MMG.stage.draw.flyingText.length; ++i) {
-				var p = MMG.stage.draw.flyingText[i];
-				if (p.life > 0){
-					p.life--;
-					drawCtx.font = p.font;
-					drawCtx.fillStyle = p.color;					
-					drawCtx.globalAlpha = p.life/p.life_max;
+			for (var i = 0; i < MMG.stage.draw_layer.length; ++i) {var p = MMG.stage.draw_layer[i]; if (p.type != null && p.life > 0){
+				switch (p.type){
+					case "flyingText": 
+						p.life--;
+						drawCtx.font = p.fontSize + "px " + p.fontFamily;
+						drawCtx.fillStyle = p.color;					
+						drawCtx.globalAlpha = p.life/p.life_max;
 
-					var life_ratio = Math.pow(p.life/p.life_max,3);
-					var radian_angle = p.angle*Math.PI/180;
-					
-					p.x += Math.cos(radian_angle)*(life_ratio)*8
-					p.y += Math.sin(radian_angle)*(life_ratio)*8
-					p.y += 1.5
-					var locX = p.x - drawCtx.measureText(p.text).width*0.5;
-					var locY = p.y 
+						var life_ratio = Math.pow(p.life/p.life_max,3);
+						var radian_angle = p.angle*Math.PI/180;
+						
+						p.x += Math.cos(radian_angle)*(life_ratio)*8;
+						p.y += Math.sin(radian_angle)*(life_ratio)*8;
+						p.y += 1.5;
+						var posX = Math.round(MMG.scale(p.x - drawCtx.measureText(p.text).width*0.5));
+						var posY =  Math.round(MMG.scale(p.y));
 
-					drawCtx.fillText(p.text, locX, locY);
-					drawCtx.globalAlpha = 1
-				} else {
-					MMG.stage.draw.flyingText.splice(i,1); i--;
+						drawCtx.fillText(p.text, posX, posY);
+						drawCtx.globalAlpha = 1;
+						break;
+
+					case "floatingText":
+						drawCtx.font = p.fontSize + "px " + p.fontFamily;
+						drawCtx.fillStyle = p.color;	
+						if (isNaN(p.opacity)){drawCtx.globalAlpha = 1} else {drawCtx.globalAlpha = p.opacity;};
+
+						var posX = Math.round(MMG.scale(p.x));
+						var posY = Math.round(MMG.scale(p.y));
+
+						var textWidth = drawCtx.measureText(p.text).width;
+
+						switch(p.textAlign){
+							case "left": var textX = posX; break;
+							case "right": var textX = posX - textWidth; break;
+							case "center": var textX = posX - textWidth/2; break;
+						}
+
+
+						drawCtx.fillText(p.text, textX, posY);
+						drawCtx.globalAlpha = 1;
+						break;
+
+					case "rect":
+						var sizeX = Math.round(MMG.scale(p.width));
+						var sizeY = Math.round(MMG.scale(p.height));
+
+						var posX = Math.round(MMG.scale(p.x));
+						var posY = Math.round(MMG.scale(p.y));
+
+						if (isNaN(p.opacity)){drawCtx.globalAlpha = 1} else {drawCtx.globalAlpha = p.opacity};
+
+						
+
+						drawCtx.fillStyle = p.backgroundColor;
+						drawCtx.beginPath();
+						drawCtx.fillRect(posX,posY,sizeX,sizeY);
+						drawCtx.closePath();
+						drawCtx.globalAlpha = 1;
+
+						if (p.text != ""){
+							var textHeight = Math.round(MMG.scale(p.fontSize));
+							var textWidth = drawCtx.measureText(p.text).width;
+							var textY = posY + sizeY/2 + textHeight/4;
+
+							switch(p.textAlign){
+								case "left": var textX = posX; break;
+								case "right": var textX = posX + sizeX - textWidth; break;
+								case "center": var textX = posX + sizeX/2 - textWidth/2; break;
+							}
+
+
+							drawCtx.font = p.fontSize + "px " + p.fontFamily;
+							drawCtx.fillStyle = p.color;
+							drawCtx.fillText(p.text, textX, textY);
+							
+						}
+
+						
+						break
+						
 				}
-			}
 
-			for (var i = 0; i < MMG.stage.draw.rect.length; ++i) {
-				var p = MMG.stage.draw.rect[i];
 
-				var sizeX = Math.round(MMG.scale(p.width));
-				var sizeY = Math.round(MMG.scale(p.height));
-
-				var posX = Math.round(MMG.scale(p.x));
-				var posY = Math.round(MMG.scale(p.y));
-
-				drawCtx.globalAlpha = p.opacity;
-				
-				drawCtx.fillStyle = p.color;
-
-				drawCtx.beginPath();
-				drawCtx.fillRect(posX,posY,sizeX,sizeY);
-				drawCtx.closePath();
-			};
-
-			for (var i = 0; i < MMG.stage.draw.floatingText.length; ++i) {
-				var p = MMG.stage.draw.floatingText[i];			
-				drawCtx.font = p.font;
-				drawCtx.fillStyle = p.color;					
-				drawCtx.globalAlpha = p.opacity;
-				drawCtx.fillText(p.text, p.x, p.y);
-				drawCtx.globalAlpha = 1;			
-			}
+			} else {MMG.stage.draw_layer.splice(i,1); i--}}
 
 			DEBUG_TEXT_WRITE();	
 		}}};
