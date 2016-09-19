@@ -27,6 +27,7 @@ define(function () {return function(SCENE){
 		GLOBALS.game_id = res.game._id;
 		GLOBALS.turn_data = res.turn_data;
 		GLOBALS.match_players = res.game.user_data;
+		RAN.generate(res.random_seed);
 		if (GLOBALS.match_players[0]._id == USER._id){GLOBALS.my_fighter = "hero"} else {GLOBALS.my_fighter = "enemy"};
 		SOCKET.emit("req.find_match.ready", GLOBALS.game_id);
 	});

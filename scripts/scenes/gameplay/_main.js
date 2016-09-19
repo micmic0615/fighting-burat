@@ -86,7 +86,7 @@ define(function () {return function(SCENE){
 				buff_to_use.alias = buff;
 				buff_to_use.max_duration = buff_to_use.duration;
 
-				SCENE.getUnit(GLOBALS.my_fighter).prebuffs.push(buff_to_use);
+				SCENE.getUnit(GLOBALS.my_fighter).queuebuffs.push(buff_to_use);
 
 				SCENE.buff_shuffle(alias.split("_")[1]);
 

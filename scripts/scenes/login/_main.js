@@ -4,7 +4,7 @@ define(function () {return function(SCENE){
 	
 	var init_socket = function(){MMG.loadScene("menu")};
 	
-	SOCKET = socket_setup('http://ec2-52-221-248-87.ap-southeast-1.compute.amazonaws.com:9000');
+	SOCKET = socket_setup();
 
 	SOCKET.on('res.user_login', function (data) {
 		USER = data;
@@ -67,6 +67,7 @@ define(function () {return function(SCENE){
 				cancel: function() {go_to_menu()}
 			});
 		} catch(err){
+			alert(err);
 			KEYS.start(function(inserted){
 				if (inserted == "ENTER"){go_to_menu()} 
 				else {update_text()};

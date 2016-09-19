@@ -2,6 +2,7 @@ var GLOBALS = {};
 var BUFFS = {};
 var SOCKET = null;
 var USER = null;
+var RAN = new mmj_random_seed();
 
 MMG.uGroups = {};
 MMG.uTypes = {};

@@ -28,6 +28,7 @@ define(function () {var THIS_UNIT = function(){
 
 	this.prop("buffs", []);
 	this.prop("debuffs", []);
+	this.prop("queuebuffs", []);
 	this.prop("prebuffs", []);
 	this.prop("staminaregen", []);
 	this.prop("temp", {});
