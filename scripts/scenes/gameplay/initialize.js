@@ -73,21 +73,19 @@ define(function () {return function(){
 			});
 		}
 
-		icons["shuffle"] = this.newUnit("ui", "btns_gameplay", {
-			alias:"shuffle", clickable: true, freeSize: true, anchored: true,
-			locX: this.getScreen().width - 100,
-			locY: this.getScreen().height - 120,
-			opacity:1,
-			width: 90,
-			height: 90,
-		});
+		// icons["shuffle"] = this.newUnit("ui", "btns_gameplay", {
+		// 	alias:"shuffle", clickable: true, freeSize: true, anchored: true,
+		// 	locX: this.getScreen().width - 100,
+		// 	locY: this.getScreen().height - 120,
+		// 	opacity:1,
+		// 	width: 90,
+		// 	height: 90,
+		// });
 
-		icons["shuffle"].clicked = this.shuffle_buffs;
-		icons["shuffle"].setAnimation("shuffle");
+		// icons["shuffle"].clicked = this.shuffle_buffs;
+		// icons["shuffle"].setAnimation("shuffle");
 
-		texts["shuffle" ] = this.drawObj("floatingText",{text:"", color: "#f0f", fontSize: 16, x: this.getScreen().width - 90, y: this.getScreen().height - 100});
-
-		
+		// texts["shuffle" ] = this.drawObj("floatingText",{text:"", color: "#f0f", fontSize: 16, x: this.getScreen().width - 90, y: this.getScreen().height - 100});
 
 		for (var i = 0; i < COMBAT.buffs_use_max; ++i) {
 			icons["usedbuffs_" + i] = this.newUnit("ui", "buff_icons", {
@@ -128,8 +126,6 @@ define(function () {return function(){
 
 		var pBars_locX = 47; 
 		bars.aggro = this.drawObj("rect", {x: 10, y: 10, width: pBars_locX - 5, height: pBars_locX - 5, backgroundColor: "f00"});
-		
-		
 
 		this.drawObj("rect", {x: (pBars_locX + 10), y: 10, width: 300, height: 13, backgroundColor: "#600"});
 		bars.current_health = this.drawObj("rect", {x: (pBars_locX + 10), y: 10, width: 300, height: 13, backgroundColor: "#f00"});
@@ -140,8 +136,6 @@ define(function () {return function(){
 		for (var i = 0; i < COMBAT.blocks_max; ++i) {
 			bars["block_" + i] = this.drawObj("rect", { x: (pBars_locX + 10) + 20*i, y: 37, width: 15, height: 15, opacity: 0.25, backgroundColor: "#09f"});
 		}
-
-		
 
 		this.drawObj("rect", {x: 10, y: (this.getScreen().height - 25), width: (this.getScreen().width - 20), height: 15, backgroundColor: "#606"});
 		bars.current_mana = this.drawObj("rect", {x: 10, y: (this.getScreen().height - 25), width: 0, height: 15, backgroundColor: "#f0f"});
@@ -216,21 +210,21 @@ define(function () {return function(){
 				icons["nextbuffs_" + i].setAnimation(p)
 			}
 
-			if (player.buffs_available.length > 0){
-				var buffs_used = player.buffs_used
-				var buffs_max = player.buffs_available.length
-				var shuffle_cost = Math.floor(player.mana_current*(0.2 - ( 0.2 * buffs_used/buffs_max))) + 10;
+			// if (player.buffs_available.length > 0){
+			// 	var buffs_used = player.buffs_used
+			// 	var buffs_max = player.buffs_available.length
+			// 	var shuffle_cost = Math.floor(player.mana_current*(0.2 - ( 0.2 * buffs_used/buffs_max))) + 10;
 
-				if (player.mana_current >= shuffle_cost){
-					icons["shuffle"].opacity = 1
-				} else {
-					icons["shuffle"].opacity = 0.35
-				}
-			} else {
-				var shuffle_cost = "-"
-			}
+			// 	if (player.mana_current >= shuffle_cost){
+			// 		icons["shuffle"].opacity = 1
+			// 	} else {
+			// 		icons["shuffle"].opacity = 0.35
+			// 	}
+			// } else {
+			// 	var shuffle_cost = "-"
+			// }
 
-			texts["shuffle" ].text = String(shuffle_cost)
+			// texts["shuffle" ].text = String(shuffle_cost)
 
 			for (var i = 0; i < COMBAT.buffs_use_max ; ++i) {
 				if (i < my_fighter.buffs.length){

@@ -1,39 +1,89 @@
 BUFFS.force = {
-	effects: "force_add",
+	effects:[{
+		name: "force_add",
+		factor: 200,
+	}, {
+		name: "stamina_dmg_add",
+		factor: 8,
+	}],
 	duration: 15,
-	factor: 200,
-	cost: 25,
+	cost: 20,
 	slot: 2,
+	type: "spell",
 	title: "FORCE PUSH",
-	tooltip: "increases knockback"
+	tooltip: "increases knockback and adds minor fear attack"
 }
 
 BUFFS.focusbreak = {
-	effects: "stamina_dmg_add",
-	duration: 10,
-	factor: 15,
-	cost: 20,
+	effects:[{
+		name: "stamina_dmg_add",
+		factor: 15,
+	}],
+	duration: 12,
+	cost: 16,
 	slot: 2,
+	type: "spell",
 	title: "FEAR ATTACK",
 	tooltip: "attacks reduces enemy bravery"
 }
 
 BUFFS.bash = {
-	effects: "stun_add",
-	duration: 3,
-	factor: 5,
-	cost: 15,
+	effects:[{
+		name: "stun_add",
+		factor: 4,
+	}],
+	duration: 0,
+	cost: 16,
 	slot: 2,
+	type: "attack",
 	title: "BASH",
-	tooltip: "attacks will stun the enemy"
+	tooltip: "the next attack will stun the target"
+}
+
+BUFFS.transmute = {
+	effects:[{
+		name: "health_heal_add",
+		factor: -30,
+	},{
+		name: "defense_heal_add",
+		factor: 60,
+	}],
+	duration: 10,
+	cost: 18,
+	slot: 1,
+	type: "spell",
+	title: "TRANSMUTE",
+	tooltip: "slowly converts health to armor"
+}
+
+BUFFS.poison = {
+	effects:[{
+		name: "health_heal_add",
+		factor: -15,
+	},{
+		name: "health_dmg_add",
+		factor: 60,
+	},{
+		name: "health_dmg_reflect_add",
+		factor: 120,
+	}],
+	duration: 6,
+	cost: 25,
+	slot: 2,
+	type: "attack",
+	title: "POISON (YOURSELF, LEZ)",
+	tooltip: "degenerate health but increase attacks and get damage return to armor"
 }
 
 BUFFS.focus = {
-	effects: "stamina_heal_add",
+	effects:[{
+		name: "stamina_heal_add",
+		factor: 3,
+	}],
 	duration: 20,
-	factor: 3,
 	cost: 15,
 	slot: 2,
+	type: "spell",
 	title: "BRAVERY UP",
 	tooltip: "continuously increases bravery"
 }

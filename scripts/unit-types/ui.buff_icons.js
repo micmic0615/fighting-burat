@@ -48,7 +48,15 @@ define(function () {var THIS_UNIT = function(){
 	animation_frame.file = ['buff_icons/thorns.png', 'buff_icons/thorns.png']; 
 	this.prop("animation.list.thorns", JSON.parse(JSON.stringify(animation_frame)));
 
-	
+	animation_frame.file = ['buff_icons/curse.png', 'buff_icons/curse.png']; 
+	this.prop("animation.list.curse", JSON.parse(JSON.stringify(animation_frame)));
+
+	animation_frame.file = ['buff_icons/acid.png', 'buff_icons/acid.png']; 
+	this.prop("animation.list.acid", JSON.parse(JSON.stringify(animation_frame)));
+
+	animation_frame.file = ['buff_icons/peacemaker.png', 'buff_icons/peacemaker.png']; 
+	this.prop("animation.list.peacemaker", JSON.parse(JSON.stringify(animation_frame)));
+
 
 
 

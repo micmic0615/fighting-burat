@@ -6,7 +6,7 @@ define(function () {return function(){
 		var origin = current.origin;
 		var target = current.target;
 
-		var damage_total = (this.fighters[origin].damage * buff_effects[origin].health_dmg_multiply * buff_effects[target].reduce_dmg_divide) + (buff_effects[origin].health_dmg_add + buff_effects[target].reduce_dmg_subtract);
+		var damage_total = (this.fighters[origin].damage + buff_effects[origin].health_dmg_add + buff_effects[target].reduce_dmg_subtract ) * buff_effects[origin].health_dmg_multiply * buff_effects[target].reduce_dmg_divide;
 
 		if (current.unit_stats[target].block > 0) {
 			var damage_health_factor = 0;
@@ -91,6 +91,16 @@ define(function () {return function(){
 		next.unit_stats[origin].health -= current.damage.origin.health;
 		next.unit_stats[origin].defense -= current.damage.origin.defense;
 		next.unit_stats[origin].stamina -= this.fighters[origin].stamina_cost;
+
+		for (var i = 0; i < next.unit_stats[origin].buffs.length; ++i) {
+			var p = next.unit_stats[origin].buffs[i];
+			if(p.type == "attack"){if (p.duration > 0) { next.unit_stats[origin].buffs[i].duration-- } else { next.unit_stats[origin].buffs.splice(i, 1); i-- }};
+		}
+
+		for (var i = 0; i < next.unit_stats[target].buffs.length; ++i) {
+			var p = next.unit_stats[target].buffs[i];
+			if(p.type == "defend"){if (p.duration > 0) { next.unit_stats[target].buffs[i].duration-- } else { next.unit_stats[target].buffs.splice(i, 1); i-- }};
+		}
 
 		if (buff_effects[origin].stun_add > 0){
 			next.unit_stats[target].debuffs.push({

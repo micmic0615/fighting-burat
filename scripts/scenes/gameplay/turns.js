@@ -67,11 +67,17 @@ define(function () { return function(){
 
 				for (var i = 0; i < next_turn.unit_stats[unit.alias].buffs.length; ++i) {
 					var p = next_turn.unit_stats[unit.alias].buffs[i];
-					if (p.effects == "speed_up" && (p.used == undefined || p.used == false)) {
-						p.used = true;
-						recalc_turns = true
-						if (p.duration > recalc_duration){recalc_duration = p.duration}
+
+					for (var i2 = 0; i2 < p.effects.length; ++i2) {
+						var p2 = p.effects[i2];
+						if (p2.name == "speed_up" && (p.used == undefined || p.used == false)) {
+							p.used = true;
+							recalc_turns = true
+							if (p.duration > recalc_duration){recalc_duration = p.duration}
+						}
 					}
+
+					
 				};				
 
 				for (var i = this.turn.index + 1; i < this.turn.sequence.length; ++i) {
@@ -136,7 +142,10 @@ define(function () { return function(){
 			if (current != undefined) {
 				for (var i2 = 0; i2 < current.unit_stats[p].buffs.length; ++i2) {
 					var p2 = current.unit_stats[p].buffs[i2];
-					if (p2.effects == "speed_up") {if (p2.duration >= this.turn.sequence_max) {unit._agi.factor += p2.factor} else {unit._agi.factor += p2.factor * (p2.duration / this.turn.sequence_max)}}
+					for (var i3 = 0; i3 < p2.effects.length; ++i3) {
+						var p3 = p2.effects[i3];
+						if (p3.name == "speed_up") {if (p2.duration >= this.turn.sequence_max) {unit._agi.factor += p3.factor} else {unit._agi.factor += p3.factor * (p2.duration / this.turn.sequence_max)}}
+					}
 				}
 			}
 
@@ -225,7 +234,7 @@ define(function () { return function(){
 
 				for (var i = 0; i < next_unit.buffs.length; ++i) {
 					var p = next_unit.buffs[i];
-					if (p.duration > 0) { next_unit.buffs[i].duration-- } else { next_unit.buffs.splice(i, 1); i-- }
+					if (p.type == "spell"){if (p.duration > 0) { next_unit.buffs[i].duration-- } else { next_unit.buffs.splice(i, 1); i-- }}
 				}
 
 				for (var i = 0; i < next_unit.debuffs.length; ++i) {
@@ -254,7 +263,7 @@ define(function () { return function(){
 					reduce_dmg_divide: 1,
 					defense_dmg_reflect_add: 0,
 					blocks_add: 0,
-					transmute_add: 0,
+					defense_heal_add: 0,
 					force_add: 0,
 					stamina_dmg_add: 0,
 					stun_add: 0,
@@ -275,36 +284,39 @@ define(function () { return function(){
 
 				for (var i = 0; i < current.unit_stats[b].buffs.length; ++i) {
 					var p = current.unit_stats[b].buffs[i];
-					var effects_check = p.effects.split("_")
-					switch (effects_check[effects_check.length - 1]) {
-						case "add": buff_effects[b][p.effects] += p.factor; break;
-						case "multiply": buff_effects[b][p.effects] *= p.factor; break;
-						case "subtract": buff_effects[b][p.effects] -= p.factor; break;
-						case "divide": buff_effects[b][p.effects] /= p.factor; break;
-					};
+					for (var i2 = 0; i2 < p.effects.length; ++i2) {
+						var p2 = p.effects[i2];
+						var effects_check = p2.name.split("_")
+						switch (effects_check[effects_check.length - 1]) {
+							case "add": buff_effects[b][p2.name] += p2.factor; break;
+							case "multiply": buff_effects[b][p2.name] *= p2.factor; break;
+							case "subtract": buff_effects[b][p2.name] -= p2.factor; break;
+							case "divide": buff_effects[b][p2.name] /= p2.factor; break;
+						};
+					};					
 				};
 
-				if (buff_effects[b]["health_heal_add"] > 0) {
+				if (buff_effects[b]["health_heal_add"] != 0) {
 					if (next_unit.health + buff_effects[b]["health_heal_add"] >= this.fighters[b].health_max) {next_unit.health = this.fighters[b].health_max}
 					else {next_unit.health += buff_effects[b]["health_heal_add"]};
 				};
 
-				if (buff_effects[b]["stamina_heal_add"] > 0) {
+				if (buff_effects[b]["stamina_heal_add"] != 0) {
 					if (next_unit.stamina + buff_effects[b]["stamina_heal_add"] >= this.fighters[b].stamina_max) {next_unit.stamina = this.fighters[b].stamina_max}
 					else {next_unit.stamina += buff_effects[b]["stamina_heal_add"]};
 				};
 
-				if (buff_effects[b]["blocks_add"] > 0) {
+				if (buff_effects[b]["blocks_add"] != 0) {
 					if (next_unit.block + buff_effects[b]["blocks_add"] >= COMBAT.blocks_max) {next_unit.block = COMBAT.blocks_max} 
 					else {next_unit.block += buff_effects[b]["blocks_add"]};
 				};
 
-				if (buff_effects[b]["transmute_add"] > 0) {
-					if (next_unit.health - buff_effects[b]["transmute_add"] / 2 <= 0) {next_unit.health = 1}
-					else {next_unit.health -= buff_effects[b]["transmute_add"] / 2};
+				if (buff_effects[b]["defense_heal_add"] != 0) {
+					if (next_unit.health - buff_effects[b]["defense_heal_add"] / 2 <= 0) {next_unit.health = 1}
+					else {next_unit.health -= buff_effects[b]["defense_heal_add"] / 2};
 
-					if (next_unit.defense + buff_effects[b]["transmute_add"] >= this.fighters[b].defense_max) {next_unit.defense = this.fighters[b].defense_max}
-					else {next_unit.defense += buff_effects[b]["transmute_add"]};
+					if (next_unit.defense + buff_effects[b]["defense_heal_add"] >= this.fighters[b].defense_max) {next_unit.defense = this.fighters[b].defense_max}
+					else {next_unit.defense += buff_effects[b]["defense_heal_add"]};
 				};
 
 				next.unit_stats[b] = next_unit;

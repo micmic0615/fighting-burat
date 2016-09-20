@@ -1,39 +1,76 @@
 BUFFS.agility = {
-	effects: "speed_up",
+	effects:[{
+		name: "speed_up",
+		factor: 2,
+	}],
 	duration: 15,
-	factor: 2,
 	cost: 25,
 	slot: 0,
+	type: "spell",
 	title: "AGILITY",
 	tooltip: "increases speed"
 }
 
+BUFFS.bleed = {
+	effects:[{
+		name: "health_dmg_add",
+		factor: 100,
+	},{
+		name: "health_dmg_multiply",
+		factor: 1.5,
+	},{
+		name: "lifesteal_add",
+		factor: -100,
+	}],
+	duration: 0,
+	cost: 25,
+	slot: 0,
+	type: "attack",
+	title: "BLEED ATTACK",
+	tooltip: "your next attack will deal a lot of damage to you and the enemy. stacks damage multiplicatively."
+}
+
 BUFFS.armorbreak = {
-	effects: "defense_dmg_add",
+	effects:[{
+		name: "defense_dmg_add",
+		factor: 160,
+	}],
 	duration: 15,
-	factor: 160,
 	cost: 15,
 	slot: 0,
+	type: "spell",
 	title: "ARMOR BREAK",
 	tooltip: "attacks deal more damage to armor"
 }
 
 BUFFS.damage = {
-	effects: "health_dmg_add",
-	duration: 15,
-	factor: 80,
+	effects:[{
+		name: "health_dmg_add",
+		factor: 80,
+	}],
+	duration: 5,
 	cost: 20,
 	slot: 0,
+	type: "spell",
 	title: "ATTACK UP",
 	tooltip: "increases damage"
 }
 
-BUFFS.thorns = {
-	effects: "health_dmg_reflect_add",
-	duration: 12,
-	factor: 60,
-	cost: 20,
+BUFFS.acid = {
+	effects:[{
+		name: "armor_heal_add",
+		factor: -15,
+	},{
+		name: "defense_dmg_add",
+		factor: 180,
+	},{
+		name: "defense_dmg_reflect_add",
+		factor: 120,
+	}],
+	duration: 6,
+	cost: 25,
 	slot: 0,
-	title: "THORNS",
-	tooltip: "being attacked causes enemy to lose health"
+	type: "defend",
+	title: "ACID",
+	tooltip: "degenerate armor but increase armor damage and get armor damage return"
 }

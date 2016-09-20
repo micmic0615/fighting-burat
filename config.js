@@ -29,8 +29,7 @@ CONF.scenes = {
 		"buffs/type_0",
 		"buffs/type_1",
 		"buffs/type_2",
-		"buffs/type_3",
-		"buffs/type_4",
+		"buffs/type_3"
 	]
 };
 

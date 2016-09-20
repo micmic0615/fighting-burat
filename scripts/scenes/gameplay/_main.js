@@ -58,24 +58,25 @@ define(function () {return function(SCENE){
 		};
 	};
 
-	SCENE["__proto__"].shuffle_buffs = function(){
-		if (SCENE.player.buffs_available.length > 0){
-			var buffs_used = SCENE.player.buffs_used
-			var buffs_max = SCENE.player.buffs_available.length
-			var shuffle_cost = Math.floor(SCENE.player.mana_current * (0.2 - ( 0.2 * buffs_used/buffs_max))) + 10;
+	// SCENE["__proto__"].shuffle_buffs = function(){
+	// 	if (SCENE.player.buffs_available.length > 0){
+	// 		var buffs_used = SCENE.player.buffs_used
+	// 		var buffs_max = SCENE.player.buffs_available.length
+	// 		var shuffle_cost = Math.floor(SCENE.player.mana_current * (0.2 - ( 0.2 * buffs_used/buffs_max))) + 10;
+	// 		var shuffle_cost = 0;
 
-			if (SCENE.player.mana_current >= shuffle_cost){
-				SCENE.player.buffs_used = 0;
-				SCENE.player.mana_current -= shuffle_cost;
-				SCENE.player.buffs_decked = JSON.parse(JSON.stringify(SCENE.player.buffs_available));
-				SCENE.player.buffs_current = [];
+	// 		if (SCENE.player.mana_current >= shuffle_cost){
+	// 			SCENE.player.buffs_used = 0;
+	// 			SCENE.player.mana_current -= shuffle_cost;
+	// 			SCENE.player.buffs_decked = JSON.parse(JSON.stringify(SCENE.player.buffs_available));
+	// 			SCENE.player.buffs_current = [];
 
-				while(SCENE.player.buffs_current.length < COMBAT.buffs_max + COMBAT.buffs_foresight){
-					SCENE.buff_shuffle("init")
-				}
-			}
-		}		
-	}
+	// 			while(SCENE.player.buffs_current.length < COMBAT.buffs_max + COMBAT.buffs_foresight){
+	// 				SCENE.buff_shuffle("init")
+	// 			}
+	// 		}
+	// 	}		
+	// }
 
 	SCENE["__proto__"].buff_my_fighter = function(buff, alias){
 		if (buff != "_empty"){
@@ -90,9 +91,10 @@ define(function () {return function(SCENE){
 
 				SCENE.buff_shuffle(alias.split("_")[1]);
 
-				if (SCENE.player.buffs_used == SCENE.player.buffs_available.length){
-					SCENE.shuffle_buffs();
-				}
+
+				// if (SCENE.player.buffs_used == SCENE.player.buffs_available.length){
+				// 	SCENE.shuffle_buffs();
+				// }
 			};
 		};
 	};
@@ -100,17 +102,15 @@ define(function () {return function(SCENE){
 	SCENE["__proto__"].buff_shuffle = function(index){
 		if (index == undefined){index = 0};
 
-		// var bonus_random = Math.floor(Math.random()*100);
-
-		// if (bonus_random < COMBAT.bonus_buff_chance){
-		// 	var buff_random = Math.floor(Math.random()*SCENE.player.bonuses_available.length);
-		// 	var selected_buff = SCENE.player.bonuses_available[buff_random];
-		// } else {
-			
-		// };
-
 		if (SCENE.player.buffs_decked.length == 0) {
-			SCENE.player.buffs_decked = ["_empty"]
+			if (SCENE.player.buffs_available.length > 0){
+				for (var i = 0; i < SCENE.player.buffs_available.length; ++i) {
+					var p = SCENE.player.buffs_available[i];
+					SCENE.player.buffs_decked.push(p);
+				};
+			} else {
+				SCENE.player.buffs_decked = ["_empty"];
+			}
 		}
 
 		var buff_random = Math.floor(Math.random() * SCENE.player.buffs_decked.length);

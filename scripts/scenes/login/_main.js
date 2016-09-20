@@ -67,7 +67,6 @@ define(function () {return function(SCENE){
 				cancel: function() {go_to_menu()}
 			});
 		} catch(err){
-			alert(err);
 			KEYS.start(function(inserted){
 				if (inserted == "ENTER"){go_to_menu()} 
 				else {update_text()};

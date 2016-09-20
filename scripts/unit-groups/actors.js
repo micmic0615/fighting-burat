@@ -99,66 +99,80 @@ THIS_UNIT.prototype.set_stats = function(stats){
 
 	for (var i = 0; i < this.buffs.length; ++i) {
 		var p = this.buffs[i];
-		var randomizer = Math.random()*30;
-		switch (p.effects){
-			case "health_heal_add":
-				if (p.factor + this.current.health >= this.derived.health){
-					var total_heal = this.derived.health - this.current.health
-				} else {
-					var total_heal = p.factor
-				}
 
-				if (p.factor >= this.derived.health*0.1){
-					randomizer = 15;
-					var fontSize = 36;
-				} else {
-					var fontSize = 18;
-				}
-
-				this.current.health += total_heal
-
-				MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#3f6", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
-				break;
+		for (var i2 = 0; i2 < p.effects.length; ++i2) {
+			var p2 = p.effects[i2];
 			
-			case "stamina_heal_add":
-				if (p.factor + this.current.stamina >= this.derived.stamina){
-					var total_heal = this.derived.stamina - this.current.stamina
-				} else {
-					var total_heal = p.factor
-				}
+			var randomizer = Math.random()*30;
+			switch (p2.name){
+				case "health_heal_add":
+					if (p2.factor + this.current.health >= this.derived.health){
+						var total_heal = this.derived.health - this.current.health
+					} else {
+						var total_heal = p2.factor
+					}
 
-				if (p.factor >= this.derived.health*0.15){
-					randomizer = 15;
-					var fontSize = 18
-					var texter = "+BRV!"
-				} else {
-					var fontSize = 10
-					var texter = "+brv!"
-				}
+					if (Math.abs(p2.factor) >= this.derived.health*0.1){
+						randomizer = 15;
+						var fontSize = 36;
+					} else {
+						var fontSize = 18;
+					}
 
-				this.current.stamina += total_heal;
-				MMG.stage.drawObj("flyingText", {text: texter, color: "#f60", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10,  angle: 255 + randomizer});
-				break;
+					this.current.health += total_heal;
 
-			case "transmute_add":
-				if (p.factor + this.current.defense >= this.derived.defense){
-					var total_heal = this.derived.defense - this.current.defense
-				} else {
-					var total_heal = p.factor
-				}
+					if (total_heal > 0){
+						MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#3f6", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
+					} else if (total_heal < 0){
+						MMG.stage.drawObj("flyingText", {text: total_heal + "!", color: "#f00", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
+					}
+					
+					break;
+				
+				case "stamina_heal_add":
+					if (p2.factor + this.current.stamina >= this.derived.stamina){
+						var total_heal = this.derived.stamina - this.current.stamina
+					} else {
+						var total_heal = p2.factor
+					}
 
-				if (p.factor >= this.derived.defense*0.1){
-					randomizer = 15;
-					var fontSize = 36;
-				} else {
-					var fontSize = 18;
-				}
+					if (p2.factor >= this.derived.health*0.15){
+						randomizer = 15;
+						var fontSize = 18
+						var texter = "+BRV!"
+					} else {
+						var fontSize = 10
+						var texter = "+brv!"
+					}
 
-				this.current.defense += total_heal
+					this.current.stamina += total_heal;
+					MMG.stage.drawObj("flyingText", {text: texter, color: "#f60", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10,  angle: 255 + randomizer});
+					break;
 
-				MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#09f", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
-				break;
+				case "defense_heal_add":
+					if (p2.factor + this.current.defense >= this.derived.defense){
+						var total_heal = this.derived.defense - this.current.defense
+					} else {
+						var total_heal = p2.factor
+					}
+
+					if (Math.abs(p2.factor) >= this.derived.defense*0.1){
+						randomizer = 15;
+						var fontSize = 36;
+					} else {
+						var fontSize = 18;
+					}
+
+					this.current.defense += total_heal
+					if (total_heal > 0){
+						MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#09f", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
+					} else if (total_heal < 0) {
+						MMG.stage.drawObj("flyingText", {text: total_heal + "!", color: "#09f", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
+					}
+					break;
+			}
 		}
+		
 	}
 
 
@@ -290,6 +304,11 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 					this.current.health += total_heal
 
 					MMG.stage.drawObj("flyingText", {text: "+"+ total_heal + "!", color: "#3f6", fontSize: 18, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
+				} else if (turn_data.damage.origin.leech_health < 0) {
+					var total_heal = turn_data.damage.origin.leech_health;
+					var randomizer = 15;	
+					this.current.health += total_heal;
+					MMG.stage.drawObj("flyingText", {text: total_heal + "!", color: "#f00", fontSize: 18, life: 100, x: this.locX, y: this.locY - 10, angle: 255 + randomizer});
 				}
 			};
 			listener.origin = true;

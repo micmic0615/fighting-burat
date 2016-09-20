@@ -17,11 +17,10 @@ define(function () {return function(SCENE){
 		1:{items:[], max:4, color:"#00f"},
 		2:{items:[], max:4, color:"#ff0"},
 		3:{items:[], max:3, color:"#0f0"},
-		4:{items:[], max:1, color:"#000"}
 	};
 	
 	var select_max = 0;
-	for (var i = 0; i < 5; ++i) {var p = buffs_selected[i]; select_max += p.max};
+	for (var i = 0; i < 4; ++i) {var p = buffs_selected[i]; select_max += p.max};
 
 	var selected_alias = "";
 	var selected_index = "";
@@ -64,7 +63,7 @@ define(function () {return function(SCENE){
 
 	
 
-	for (var u = 0; u < 5; ++u) {
+	for (var u = 0; u < 4; ++u) {
 		var b = buffs_selected[u];
 		for (var i = 0; i < b.max; ++i) {		
 			SCENE.bars["buff_slot_" + u + "_" + i] = SCENE.drawObj("rect", {
@@ -185,11 +184,15 @@ define(function () {return function(SCENE){
 	
 	function add_buff(){
 		if (selected_alias != ""){	
-			
-			if (BUFFS[selected_alias].slot != 4){
-				var slot = BUFFS[selected_alias].slot
+			var slot = BUFFS[selected_alias].slot
 
-				if (buffs_selected[slot].items.length < buffs_selected[slot].max){
+			if (buffs_selected[slot].items.length < buffs_selected[slot].max){
+				var duplicate = false;
+				for (var i = 0; i < buffs_selected[slot].items.length; ++i) {
+					if (selected_alias == buffs_selected[slot].items[i]){duplicate = true}
+				}
+
+				if (!duplicate){
 					var buff_index = buffs_selected[slot].items.length;
 					SCENE.bars["buff_slot_" + slot + "_" + buff_index].opacity = 0;
 					SCENE.icons["buff_slot_" + slot + "_" + buff_index].opacity = 1;
@@ -197,11 +200,11 @@ define(function () {return function(SCENE){
 
 					buffs_selected[slot].items.push(selected_alias);
 				} else {
-					alert("cannot add more buffs from this category")
-				}	
+					alert("this buff is already equiped")
+				}
 			} else {
-				alert("special abilities are not yet implemented")
-			}					
+				alert("cannot add more buffs from this category")
+			}				
 		} else {
 			alert("select a buff to add")
 		}
