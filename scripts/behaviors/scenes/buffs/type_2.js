@@ -11,7 +11,15 @@ BUFFS.force = {
 	slot: 2,
 	type: "spell",
 	title: "FORCE PUSH",
-	tooltip: "increases knockback and adds minor fear attack"
+	tooltip: "increases knockback and adds minor fear attack",
+	sfx: [{
+		sprite: "stupid",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }
 
 BUFFS.focusbreak = {
@@ -24,7 +32,15 @@ BUFFS.focusbreak = {
 	slot: 2,
 	type: "spell",
 	title: "FEAR ATTACK",
-	tooltip: "attacks reduces enemy bravery"
+	tooltip: "attacks reduces enemy bravery",
+	sfx: [{
+		sprite: "fear",
+		frames: 1,
+		trigger: "attack",
+		unit: "target",
+		life: 40,
+		motion: "none"
+	}]
 }
 
 BUFFS.bash = {
@@ -37,7 +53,15 @@ BUFFS.bash = {
 	slot: 2,
 	type: "attack",
 	title: "BASH",
-	tooltip: "the next attack will stun the target"
+	tooltip: "the next attack will stun the target",
+	sfx: [{
+		sprite: "bash",
+		frames: 1,
+		trigger: "attack",
+		unit: "target",
+		life: 100,
+		motion: "none"
+	}]
 }
 
 BUFFS.transmute = {
@@ -53,7 +77,15 @@ BUFFS.transmute = {
 	slot: 1,
 	type: "spell",
 	title: "TRANSMUTE",
-	tooltip: "slowly converts health to armor"
+	tooltip: "slowly converts health to armor",
+	sfx: [{
+		sprite: "stupid",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }
 
 BUFFS.poison = {
@@ -61,7 +93,7 @@ BUFFS.poison = {
 		name: "health_heal_add",
 		factor: -15,
 	},{
-		name: "health_dmg_add",
+		name: "normal_dmg_add",
 		factor: 60,
 	},{
 		name: "health_dmg_reflect_add",
@@ -72,7 +104,15 @@ BUFFS.poison = {
 	slot: 2,
 	type: "attack",
 	title: "POISON (YOURSELF, LEZ)",
-	tooltip: "degenerate health but increase attacks and get damage return to armor"
+	tooltip: "degenerate health but increase attacks and get damage return to armor",
+	sfx: [{
+		sprite: "stupid",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }
 
 BUFFS.focus = {
@@ -85,5 +125,13 @@ BUFFS.focus = {
 	slot: 2,
 	type: "spell",
 	title: "BRAVERY UP",
-	tooltip: "continuously increases bravery"
+	tooltip: "continuously increases bravery",
+	sfx: [{
+		sprite: "stupid",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }

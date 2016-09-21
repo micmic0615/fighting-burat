@@ -11,7 +11,15 @@ BUFFS.defense = {
 	slot: 1,
 	type: "spell",
 	title: "DEFENSE UP",
-	tooltip: "reduces damage taken"
+	tooltip: "reduces damage taken",
+	sfx: [{
+		sprite: "stupid",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }
 
 BUFFS.thorns = {
@@ -24,7 +32,15 @@ BUFFS.thorns = {
 	slot: 1,
 	type: "spell",
 	title: "THORNS",
-	tooltip: "being attacked causes enemy to lose health"
+	tooltip: "being attacked causes enemy to lose health",
+	sfx: [{
+		sprite: "thorns",
+		frames: 3,
+		trigger: "defend",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }
 
 BUFFS.deflect = {
@@ -37,7 +53,15 @@ BUFFS.deflect = {
 	slot: 1,
 	type: "spell",
 	title: "DEFLECT",
-	tooltip: "being attacked causes enemy to lose armor"
+	tooltip: "being attacked causes enemy to lose armor",
+	sfx: [{
+		sprite: "deflect",
+		frames: 3,
+		trigger: "defend",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }
 
 BUFFS.curse = {
@@ -54,7 +78,7 @@ BUFFS.curse = {
 		name: "health_heal_add",
 		factor: -20,
 	},{
-		name: "health_dmg_multiply",
+		name: "normal_dmg_multiply",
 		factor: 0.65,
 	}],
 	duration: 6,
@@ -62,7 +86,15 @@ BUFFS.curse = {
 	slot: 1,
 	type: "defend",
 	title: "CURSE",
-	tooltip: "reduce your attack and degenerate health for greatly increased defense and damage return"
+	tooltip: "reduce your attack and degenerate health for greatly increased defense and damage return",
+	sfx: [{
+		sprite: "curse",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 25,
+		motion: "none"
+	}]
 }
 
 BUFFS.vanguard = {
@@ -75,5 +107,13 @@ BUFFS.vanguard = {
 	slot: 1,
 	type: "spell",
 	title: "VANGUARD",
-	tooltip: "instantly adds a lot of shields"
+	tooltip: "instantly adds a lot of shields",
+	sfx: [{
+		sprite: "stupid",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }

@@ -34,6 +34,8 @@ define(function () {return function(SCENE){
 	SCENE.bars = {};
 	SCENE.icons = {};
 	SCENE.texts = {};
+	
+	SCENE.sfx_dummies = [];
 
 	// LOAD SUBSCRIPTS
 	
@@ -57,6 +59,13 @@ define(function () {return function(SCENE){
 			}; 
 		};
 	};
+
+	SCENE["__proto__"].get_sfx_dummy = function(){
+		for (var i = 0; i < SCENE.sfx_dummies.length; ++i) {
+			var p = SCENE.sfx_dummies[i];
+			if (p.life == 0){return p};
+		};
+	}
 
 	// SCENE["__proto__"].shuffle_buffs = function(){
 	// 	if (SCENE.player.buffs_available.length > 0){

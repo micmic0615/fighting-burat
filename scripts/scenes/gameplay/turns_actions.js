@@ -6,7 +6,7 @@ define(function () {return function(){
 		var origin = current.origin;
 		var target = current.target;
 
-		var damage_total = (this.fighters[origin].damage + buff_effects[origin].health_dmg_add + buff_effects[target].reduce_dmg_subtract ) * buff_effects[origin].health_dmg_multiply * buff_effects[target].reduce_dmg_divide;
+		var damage_total = (this.fighters[origin].damage + buff_effects[origin].normal_dmg_add + buff_effects[target].reduce_dmg_subtract ) * buff_effects[origin].normal_dmg_multiply * buff_effects[target].reduce_dmg_divide;
 
 		if (current.unit_stats[target].block > 0) {
 			var damage_health_factor = 0;
@@ -18,7 +18,7 @@ define(function () {return function(){
 			var damage_health_factor = 0.5;
 			var damage_defense_factor = 0.5;
 			var push_resist = 1;
-			var defense_spill_factor = 1.25
+			var defense_spill_factor = 1.5
 		}
 
 		if (Math.round(damage_total * damage_defense_factor) >= current.unit_stats[target].defense) {
@@ -29,11 +29,13 @@ define(function () {return function(){
 			var damage_defense_spill = 0;
 		}
 
-		current.damage.target.defense *= buff_effects[origin].defense_dmg_multiply;
 		current.damage.target.defense += buff_effects[origin].defense_dmg_add;
+		current.damage.target.defense *= buff_effects[origin].defense_dmg_multiply;
 		if (Math.round(current.damage.target.defense) >= current.unit_stats[target].defense) { current.damage.target.defense = current.unit_stats[target].defense }
 
 		current.damage.target.health = Math.round((damage_total * damage_health_factor) + damage_defense_spill);
+		current.damage.target.health += buff_effects[origin].health_dmg_add;
+		current.damage.target.health *= buff_effects[origin].health_dmg_multiply;
 
 		if (current.unit_stats[target].stamina > 0) {
 			current.damage.target.stamina = (current.unit_stats[target].stamina - (current.unit_stats[target].stamina / buff_effects[origin].stamina_dmg_multiply)) + buff_effects[origin].stamina_dmg_add;

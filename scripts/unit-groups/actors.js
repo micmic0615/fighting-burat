@@ -195,6 +195,8 @@ THIS_UNIT.prototype.set_stats = function(stats){
 }
 
 THIS_UNIT.prototype.take_damage = function(origin, damage_data){
+
+	
 	
 	if (MMG.stage == undefined) return null;
 
@@ -276,6 +278,53 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 	} else {
 		if (this.animation.frameCurrent >= 2){ 		
 			if (this.temp.damage_dealt == false){
+				var current = MMG.stage.turn.sequence[MMG.stage.turn.index];
+
+				for (var i = 0; i < current.unit_stats[this.alias].buffs.length; ++i) {
+					var p = current.unit_stats[this.alias].buffs[i];
+					for (var i2 = 0; i2 < p.sfx.length; ++i2) {
+						var p2 = p.sfx[i2];
+						if (p2.trigger == "attack"){
+							var sfx_dummy = MMG.stage.get_sfx_dummy();
+
+							if(this.alias == "hero"){sfx_dummy.scaleX == 1} else {sfx_dummy.scaleX == -1};
+					
+							if (p2.unit == "origin"){sfx_dummy.unit = this.alias} 
+							else {
+								if (this.alias == "hero"){sfx_dummy.unit = "enemy"} 
+								else {sfx_dummy.unit = "hero"}
+							}
+
+							sfx_dummy.life = p2.life;
+							sfx_dummy.setAnimation(p2.sprite);
+						}
+					}
+				}
+
+				for (var i = 0; i < current.unit_stats[target.alias].buffs.length; ++i) {
+					var p = current.unit_stats[target.alias].buffs[i];
+					for (var i2 = 0; i2 < p.sfx.length; ++i2) {
+						var p2 = p.sfx[i2];
+						if (p2.trigger == "defend"){
+							var sfx_dummy = MMG.stage.get_sfx_dummy();
+							
+							if(target.alias == "hero"){sfx_dummy.scaleX == 1} else {sfx_dummy.scaleX == -1};
+					
+							if (p2.unit == "origin"){sfx_dummy.unit = target.alias} 
+							else {
+								if (target.alias == "hero"){sfx_dummy.unit = "enemy"} 
+								else {sfx_dummy.unit = "hero"}
+							}
+
+							sfx_dummy.life = p2.life;
+							sfx_dummy.setAnimation(p2.sprite);
+						}
+					}
+				}
+
+
+				
+
 				var dealt = {
 					health: turn_data.damage.target.health,
 					defense: turn_data.damage.target.defense,
@@ -398,7 +447,7 @@ THIS_UNIT.prototype.cast = function(target, turn_data){
 }
 
 THIS_UNIT.prototype.flinch = function(origin, turn_data){
-	if (MMG.stage == undefined) return null;
+	if (MMG.stage == undefined) return null;	
 
 	var listener = false;
 	if (origin.locX > this.locX){ var direction = -1 } else { var direction = 1 };

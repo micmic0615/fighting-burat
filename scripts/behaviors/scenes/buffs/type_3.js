@@ -8,7 +8,15 @@ BUFFS.heal = {
 	slot: 3,
 	type: "spell",
 	title: "JESUS",
-	tooltip: "Jesus Christ instantly mend lost health"
+	tooltip: "Jesus Christ instantly mend lost health",
+	sfx: [{
+		sprite: "heal",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 70,
+		motion: "none"
+	}]
 }
 
 BUFFS.regen = {
@@ -21,7 +29,15 @@ BUFFS.regen = {
 	slot: 3,
 	type: "spell",
 	title: "MARY",
-	tooltip: "Mama Mary gradually mend lost health over time"
+	tooltip: "Mama Mary gradually mend lost health over time",
+	sfx: [{
+		sprite: "regen",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 35,
+		motion: "none"
+	}]
 }
 
 BUFFS.lifesteal = {
@@ -34,12 +50,28 @@ BUFFS.lifesteal = {
 	slot: 3,
 	type: "spell",
 	title: "LIFESTEAL",
-	tooltip: "Successful attacks mend lost health"
+	tooltip: "Successful attacks mend lost health",
+	sfx: [{
+		sprite: "lifesteal_target",
+		frames: 1,
+		trigger: "attack",
+		unit: "target",
+		life: 40,
+		motion: "none"
+	},
+	{
+		sprite: "lifesteal_origin",
+		frames: 2,
+		trigger: "attack",
+		unit: "origin",
+		life: 40,
+		motion: "none"
+	}]
 }
 
 BUFFS.peacemaker = {
 	effects:[{
-		name: "health_dmg_multiply",
+		name: "normal_dmg_multiply",
 		factor: 0.35,
 	},{
 		name: "health_heal_add",
@@ -56,5 +88,13 @@ BUFFS.peacemaker = {
 	slot: 3,
 	type: "defend",
 	title: "PEACEMAKER",
-	tooltip: "Give up a good chunk of your damage for greater regeneration daamage reductton and fear attacks"
+	tooltip: "Give up a good chunk of your damage for greater regeneration daamage reductton and fear attacks",
+	sfx: [{
+		sprite: "stupid",
+		frames: 2,
+		trigger: "spell",
+		unit: "origin",
+		life: 15,
+		motion: "none"
+	}]
 }

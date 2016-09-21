@@ -57,61 +57,82 @@ define(function () { return function(){
 				
 				for (var i = 0; i < unit.prebuffs.length; ++i) {
 					var p = unit.prebuffs[i];
-					this.turn.sequence[this.turn.index + 1].unit_stats[unit.alias].buffs.push(p);
-					
+					this.turn.sequence[this.turn.index + 1].unit_stats[unit.alias].buffs.push(p);	
 					unit.prebuffs.splice(i,1); i--;
 				};
+			};
 
-				var recalc_turns = false;
-				var recalc_duration = 0;
+			var recalc_turns = false;
+			var recalc_duration = 0;
 
-				for (var i = 0; i < next_turn.unit_stats[unit.alias].buffs.length; ++i) {
-					var p = next_turn.unit_stats[unit.alias].buffs[i];
+			for (var i = 0; i < next_turn.unit_stats[unit.alias].buffs.length; ++i) {
+				var p = next_turn.unit_stats[unit.alias].buffs[i];
 
-					for (var i2 = 0; i2 < p.effects.length; ++i2) {
-						var p2 = p.effects[i2];
-						if (p2.name == "speed_up" && (p.used == undefined || p.used == false)) {
-							p.used = true;
-							recalc_turns = true
-							if (p.duration > recalc_duration){recalc_duration = p.duration}
-						}
+				for (var i2 = 0; i2 < p.effects.length; ++i2) {
+					var p2 = p.effects[i2];
+					if (p2.name == "speed_up" && (p.used == undefined || p.used == false)) {
+						p.used = true;
+						recalc_turns = true
+						if (p.duration > recalc_duration){recalc_duration = p.duration}
 					}
+				}
+			};				
 
-					
-				};				
+			for (var i = this.turn.index + 1; i < this.turn.sequence.length; ++i) {
+				var p = this.turn.sequence[i];
+				p.evaluated = false;
+			};
 
-				for (var i = this.turn.index + 1; i < this.turn.sequence.length; ++i) {
+			if (recalc_turns){
+				var test_before = [];
+				var test_after = []
+				
+				for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
 					var p = this.turn.sequence[i];
-					p.evaluated = false;
-				};
+					test_before.push(p.origin)
+				}
 
-				if (recalc_turns){
-					var test_before = [];
-					var test_after = []
-					
-					for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
-						var p = this.turn.sequence[i];
-						test_before.push(p.origin)
-					}
+				calculate_turns.bind(this)(this.turn.index + 1, recalc_duration);
 
-					calculate_turns.bind(this)(this.turn.index + 1, recalc_duration);
-
-					for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
-						var p = this.turn.sequence[i];
-						test_after.push(p.origin)
-					}
-				} else {
-					evaluate_sequence.bind(this)(this.turn.index + 1)
-				};
+				for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
+					var p = this.turn.sequence[i];
+					test_after.push(p.origin)
+				}
+			} else {
+				evaluate_sequence.bind(this)(this.turn.index + 1)
 			};
 		};
 	};
 
 	function change_turn_phase(){
 		var current = this.turn.sequence[this.turn.index];
-
+		var next = this.turn.sequence[this.turn.index + 1];
+		
 		var origin = this.getUnit(current.origin);
 		var target = this.getUnit(current.target);
+
+		var fighters = ["hero", "enemy"]
+
+		for (var u = 0; u < fighters.length; ++u) {var b = fighters[u];
+			for (var i = 0; i < next.unit_stats[b].buffs.length; ++i) {
+				var p = next.unit_stats[b].buffs[i];
+				for (var i2 = 0; i2 < p.sfx.length; ++i2) {
+					var p2 = p.sfx[i2];
+					if (p2.trigger == "spell"){
+						var sfx_dummy = this.get_sfx_dummy();
+				
+						if (p2.unit == "origin"){sfx_dummy.unit = b} 
+						else {
+							if (b == "hero"){sfx_dummy.unit = "enemy"} 
+							else {sfx_dummy.unit = "hero"}
+						}
+
+						sfx_dummy.life = p2.life;
+						sfx_dummy.setAnimation(p2.sprite);
+					}
+				}
+			}
+		}
 
 		if (origin.current.health <= 0 || target.current.health <= 0){if (origin.alias == "hero"){var message = "YOU WIN!"} else {var message = "YOU LOSE!"}; game_over = true};
 
@@ -234,7 +255,12 @@ define(function () { return function(){
 
 				for (var i = 0; i < next_unit.buffs.length; ++i) {
 					var p = next_unit.buffs[i];
-					if (p.type == "spell"){if (p.duration > 0) { next_unit.buffs[i].duration-- } else { next_unit.buffs.splice(i, 1); i-- }}
+					if (p.type == "spell"){
+						if (p.duration > 0) { p.duration-- } 
+						else { 
+							next_unit.buffs.splice(i, 1); i-- 
+						}
+					}
 				}
 
 				for (var i = 0; i < next_unit.debuffs.length; ++i) {
@@ -257,6 +283,7 @@ define(function () { return function(){
 				};
 
 				buff_effects[b] = {
+					normal_dmg_add: 0,
 					health_dmg_add: 0,
 					defense_dmg_add: 0,
 					health_dmg_reflect_add: 0,
@@ -271,6 +298,7 @@ define(function () { return function(){
 					health_heal_add: 0,
 					lifesteal_add: 0,
 
+					normal_dmg_multiply: 1,
 					health_dmg_multiply: 1,
 					defense_dmg_multiply: 1,
 					stamina_dmg_multiply: 1,
@@ -289,9 +317,9 @@ define(function () { return function(){
 						var effects_check = p2.name.split("_")
 						switch (effects_check[effects_check.length - 1]) {
 							case "add": buff_effects[b][p2.name] += p2.factor; break;
-							case "multiply": buff_effects[b][p2.name] *= p2.factor; break;
 							case "subtract": buff_effects[b][p2.name] -= p2.factor; break;
-							case "divide": buff_effects[b][p2.name] /= p2.factor; break;
+							case "multiply": if (p2.factor > 0){buff_effects[b][p2.name] *= p2.factor}; break;
+							case "divide": if (p2.factor > 0){buff_effects[b][p2.name] /= p2.factor}; break;
 						};
 					};					
 				};
@@ -312,9 +340,6 @@ define(function () { return function(){
 				};
 
 				if (buff_effects[b]["defense_heal_add"] != 0) {
-					if (next_unit.health - buff_effects[b]["defense_heal_add"] / 2 <= 0) {next_unit.health = 1}
-					else {next_unit.health -= buff_effects[b]["defense_heal_add"] / 2};
-
 					if (next_unit.defense + buff_effects[b]["defense_heal_add"] >= this.fighters[b].defense_max) {next_unit.defense = this.fighters[b].defense_max}
 					else {next_unit.defense += buff_effects[b]["defense_heal_add"]};
 				};

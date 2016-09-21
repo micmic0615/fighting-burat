@@ -214,8 +214,9 @@ define(function () {return function(SCENE){
 	function go_play(){
 		reload = 10;
 		var buffs_to_export = [];
-		for (var u = 0; u < 5; ++u) {
+		for (var u = 0; u < 4; ++u) {
 			var b = buffs_selected[u];
+			console.log(b)
 			for (var i = 0; i < b.items.length; ++i) {
 				var p = b.items[i];
 				buffs_to_export.push(p)

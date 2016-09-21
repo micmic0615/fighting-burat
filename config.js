@@ -40,11 +40,13 @@ CONF.units = {
 	groups:[
 		"actors",
 		"tiles",
+		"doodads"
 	],
 	types:  [
 		"actors.demon", 
 		"actors.knight", 
 		"tiles.floor", 
+		"doodads.buff_sfx",
 		"ui.turn_icons", 
 		"ui.buff_icons", 
 		"ui.btns_menu", 

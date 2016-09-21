@@ -32,7 +32,14 @@ define(function () {return function(){
 		zIndex: 10
 	});
 
-	var my_fighter = this.getUnit(GLOBALS.my_fighter)
+	var sfx_dummy_count = 40;
+	while(sfx_dummy_count > 0){
+		sfx_dummy_count--;
+		this.sfx_dummies.push(this.newUnit("main", "buff_sfx", {zIndex: 101}));
+	}
+
+
+	var my_fighter = this.getUnit(GLOBALS.my_fighter);
 
 	generate_icons.bind(this)();
 	
@@ -165,8 +172,6 @@ define(function () {return function(){
 
 		texts["hero_name"] = this.drawObj("floatingText",{text: GLOBALS.match_players[0].name, color: hero_color, fontSize: 12, x: this.getUnit("hero").locX , y: this.getUnit("hero").locY - 75, textAlign: "center"});
 		texts["enemy_name"] = this.drawObj("floatingText",{text: GLOBALS.match_players[1].name, color: enemy_color, fontSize: 12, x: this.getUnit("enemy").locX , y: this.getUnit("enemy").locY - 75, textAlign: "center"});
-
-		console.log(GLOBALS)
 	}
 
 	function update_always(){
