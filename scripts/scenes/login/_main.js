@@ -22,11 +22,22 @@ define(function () {return function(SCENE){
 	}
 	
 	var prep = 10;
+	var text_input = null;
 	SCENE.always(function(){
 		if (prep > 0){prep--};
 
 		if (prep == 1){
-			var text_input = SCENE.drawObj("rect", {
+			bg_clicker = SCENE.drawObj("rect", {
+				x: 0,
+				y: 0,
+				width: MMG.stage.world.width,
+				height: MMG.stage.world.height,
+				backgroundColor: "#000",
+				clickable: true,
+				clicked: function(){alert("woo")}
+			})
+
+			text_input = SCENE.drawObj("rect", {
 				x: SCENE.world.width/2 - 200,
 				y: 80,
 				fontSize: 18,
@@ -37,6 +48,37 @@ define(function () {return function(SCENE){
 				height: 40,
 				text:'input your name then press [ENTER]',
 				textAlign: "center",
+				clickable: true,
+				clicked: function(){keyboard_init(text_input)}
+			});
+
+			SCENE.drawObj("rect", {
+				x: SCENE.world.width/2 - 200,
+				y: 80,
+				fontSize: 18,
+				fontFamily: 'Arial',
+				backgroundColor: "#fff",
+				color: "#bbb",
+				width: 400,
+				height: 40,
+				zIndex: -1,
+				text:'input your name then press [ENTER]',
+				textAlign: "center"
+			});
+
+			SCENE.drawObj("rect", {
+				x: SCENE.world.width/2 - 200,
+				y: 135,
+				fontSize: 18,
+				fontFamily: 'Arial',
+				backgroundColor: "#f66",
+				color: "#fff",
+				width: 400,
+				height: 55,
+				zIndex: 1,
+				text:'LOG-IN',
+				textAlign: "center",
+				clicked: go_to_menu
 			});
 
 			if (localStorage.getItem("burat_user") != undefined){
@@ -44,9 +86,23 @@ define(function () {return function(SCENE){
 				KEYS.text = USER.name
 			}
 
-			keyboard_init(text_input);
+			if (KEYS.text ==  ""){
+				text_input.text = "input your name then press [ENTER]";
+				text_input.color = "#bbb";
+			} else {
+				text_input.text = KEYS.text;
+				text_input.color = "#000";
+			}
+
+			KEYS.text = "";
 		}
 	})
+
+
+	function go_to_menu(){
+		if (KEYS.text == ""){KEYS.text = "boring user no. " + new Date().getTime()};
+		io_register(KEYS.text);
+	}
 
 	function keyboard_init(text_input){
 		update_text();
@@ -63,8 +119,8 @@ define(function () {return function(SCENE){
 					KEYS.text = text;
 					update_text();
 				},
-				done: function() {go_to_menu()},
-				cancel: function() {go_to_menu()}
+				done: function() {},
+				cancel: function() {}
 			});
 		} catch(err){
 			KEYS.start(function(inserted){
@@ -73,10 +129,7 @@ define(function () {return function(SCENE){
 			});
 		};
 
-		function go_to_menu(){
-			if (KEYS.text == ""){KEYS.text = "boring user no. " + new Date().getTime()};
-			io_register(KEYS.text);
-		}
+		
 
 		function update_text(){
 			if (KEYS.text ==  ""){

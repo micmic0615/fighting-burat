@@ -75,18 +75,38 @@ MMG.loadScene = function(name){
 				var pointX = (MMG.resolution.width / window.innerWidth) * e.clientX
 				var pointY = (MMG.resolution.height / window.innerHeight) * e.clientY			
 				
-				for (var i = 0; i < MMG.stage.units.length; ++i) {
+				for (var i = MMG.stage.units.length - 1; i >= 0; --i) {
 					var p = MMG.stage.units[i];
 					if (p.clickable) {
 						if (pointX >= p.screen.left && pointX <= p.screen.right) {
 							if (pointY >= p.screen.top && pointY <= p.screen.bottom) {
-								p.clicked()
+								p.clicked();
+								break;
+							}
+						}
+					}
+				}	
+
+				for (var i =  MMG.stage.drawings.length - 1; i >= 0; --i) {
+					var p = MMG.stage.drawings[i];
+					if (p.type == "rect" && p.clicked != undefined) {
+
+						var sizeX = Math.round(MMG.scale(p.width));
+						var sizeY = Math.round(MMG.scale(p.height));
+
+						var posX = Math.round(MMG.scale(p.x));
+						var posY = Math.round(MMG.scale(p.y));
+
+						if (pointX >= p.screen.left && pointX <= p.screen.right) {
+							if (pointY >= p.screen.top && pointY <= p.screen.bottom) {
+								p.clicked();
+								break;
 							}
 						}
 					}
 				}	
 			});
-
+	
 			MMG.clickListener.focus();
 			MMG.clickListener.addEventListener('keydown',function(e){if (KEYS.on){
 				if (e.keyCode == 16){KEYS.shift = true};
@@ -127,12 +147,10 @@ MMG.render = function(){
 
 					var newCanvas = new MMG.createCanvas(p.alias, nextSibling.canvas );
 
-					MMG.stage.layers[i].canvas = newCanvas;
-					MMG.stage.layers[i].context = newCanvas.getContext('2d');
-
+					p.canvas = newCanvas;
+					p.context = newCanvas.getContext('2d');
 					
-					
-					var ctx = MMG.stage.layers[i].context;
+					var ctx = p.context;
 
 					MMG.stage.layers.sort(keysrt("zIndex"));
 				} else {
@@ -206,10 +224,10 @@ MMG.render = function(){
 					
 					ctx.globalAlpha = 1;
 
-					MMG.stage.layers[i].units[i2].screen.left = hitPosX;
-					MMG.stage.layers[i].units[i2].screen.right = hitPosX + hitX;
-					MMG.stage.layers[i].units[i2].screen.top = hitPosY;
-					MMG.stage.layers[i].units[i2].screen.bottom = hitPosY + hitY;
+					p2.screen.left = hitPosX;
+					p2.screen.right = hitPosX + hitX;
+					p2.screen.top = hitPosY;
+					p2.screen.bottom = hitPosY + hitY;
 
 					if (p2.group != "ui" || p2.anchored || p2.freeSize){DEBUG_HITBOX(hitX, hitY, hitPosX, hitPosY, ctx)}
 
@@ -223,7 +241,9 @@ MMG.render = function(){
 			var drawCtx = MMG.drawCanvas.getContext('2d');
 			drawCtx.clearRect(0,0,MMG.drawCanvas.width,MMG.drawCanvas.height);
 
-			for (var i = 0; i < MMG.stage.draw_layer.length; ++i) {var p = MMG.stage.draw_layer[i]; if (p.type != null && p.life > 0){
+			MMG.stage.drawings.sort(keysrt("zIndex"));
+
+			for (var i = 0; i < MMG.stage.drawings.length; ++i) {var p = MMG.stage.drawings[i]; if (p.type != null && p.life > 0){
 				switch (p.type){
 					case "flyingText": 
 						p.life--;
@@ -260,7 +280,6 @@ MMG.render = function(){
 							case "center": var textX = posX - textWidth/2; break;
 						}
 
-
 						drawCtx.fillText(p.text, textX, posY);
 						drawCtx.globalAlpha = 1;
 						break;
@@ -272,9 +291,12 @@ MMG.render = function(){
 						var posX = Math.round(MMG.scale(p.x));
 						var posY = Math.round(MMG.scale(p.y));
 
-						if (isNaN(p.opacity)){drawCtx.globalAlpha = 1} else {drawCtx.globalAlpha = p.opacity};
+						p.screen.left = posX;
+						p.screen.right = posX + sizeX;
+						p.screen.top = posY;
+						p.screen.bottom = posY + sizeY;
 
-						
+						if (isNaN(p.opacity)){drawCtx.globalAlpha = 1} else {drawCtx.globalAlpha = p.opacity};
 
 						drawCtx.fillStyle = p.backgroundColor;
 						drawCtx.beginPath();
@@ -299,14 +321,11 @@ MMG.render = function(){
 							drawCtx.fillText(p.text, textX, textY);
 							
 						}
-
-						
 						break
-						
 				}
 
 
-			} else {MMG.stage.draw_layer.splice(i,1); i--}}
+			} else {MMG.stage.drawings.splice(i,1); i--}}
 
 			DEBUG_TEXT_WRITE();	
 		}}};

@@ -43,8 +43,9 @@ CONF.units = {
 		"doodads"
 	],
 	types:  [
-		"actors.demon", 
+		"actors.berserker", 
 		"actors.knight", 
+		"actors.trickster", 
 		"tiles.floor", 
 		"doodads.buff_sfx",
 		"ui.turn_icons", 

@@ -18,7 +18,7 @@ function SCENE(_DIR){
 	// this.prop("draw.rect", []);
 	// this.prop("draw.textInput", []);
 
-	this.prop("draw_layer", []);
+	this.prop("drawings", []);
 
 	this.prop("camera.locX", this.getScreen().width/2);
 	this.prop("camera.locY", this.getScreen().height/2);
@@ -101,12 +101,24 @@ SCENE.prototype.drawObj = function(type, prop){
 		life: 1,
 		lifeMax: 1,
 		angle: 0,
+		zIndex: 0,
 		color: "#000",
-		backgroundColor: "#fff",
 		text: "",
 		textAlign: "left",
-		fontFamily: "Arial"
+		fontFamily: "Arial",
 	};
+
+	switch(type){
+		case "rect":
+			drawObj.backgroundColor = "#fff";
+			drawObj.screen = {
+				left: 0,
+				right: 0,
+				top: 0,
+				bottom: 0
+			}; 
+			break;
+	}
 
 	drawObj.type = type;
 
@@ -116,13 +128,13 @@ SCENE.prototype.drawObj = function(type, prop){
 		if (p == "life"){drawObj["life_max"] = prop[p]}
 	}
 
-	this.draw_layer.push(drawObj);
+	this.drawings.push(drawObj);
 	return drawObj;
 }
 
 SCENE.prototype.getDrawObj = function(alias){
-	for (var i = 0; i < this.draw_layer.length; ++i) {
-		var p = this.draw_layer[i];
+	for (var i = 0; i < this.drawings.length; ++i) {
+		var p = this.drawings[i];
 		if (p.alias == alias){return p};
 	}
 }
