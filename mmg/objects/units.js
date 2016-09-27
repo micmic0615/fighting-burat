@@ -1,6 +1,7 @@
 MMG.units = {};
 
 function UNIT(type){
+	this.prop("hidden", false);
 	this.prop("locX", 0);
 	this.prop("locY", 0);
 	this.prop("zIndex", 0);
@@ -134,6 +135,18 @@ UNIT.prototype.setType = function(type){
 
 	var groupProto = Object.keys(groupObj.__proto__);
 	for (var i = 0; i < groupProto.length; i++) {
+		if (groupProto[i] == "birth"){this.onBirth.push(groupObj.__proto__[groupProto[i]].bind(this))};
+	};
+
+	var typeProto = Object.keys(typeObj.__proto__);
+	for (var i = 0; i < typeProto.length; i++) {
+		if ( typeProto[i] == "birth"){this.onBirth.push(typeObj.__proto__[ typeProto[i]].bind(this))};
+	};
+
+	for (var i = 0; i < this.onBirth.length; ++i) {this.onBirth[i]()};
+
+	var groupProto = Object.keys(groupObj.__proto__);
+	for (var i = 0; i < groupProto.length; i++) {
 		var p = groupProto[i];
 		if (this.__proto__[p] == undefined){
 			this.__proto__[p] = groupObj.__proto__[p]
@@ -142,7 +155,6 @@ UNIT.prototype.setType = function(type){
 				case "always": this.always(groupObj.__proto__[p].bind(this)); break;
 				case "die": this.onDie.push(groupObj.__proto__[p].bind(this)); break;
 				case "kill": this.onKill.push(groupObj.__proto__[p].bind(this)); break;
-				case "birth": this.onBirth.push(groupObj.__proto__[p].bind(this)); break;
 				case "clicked": this.onClick.push(groupObj.__proto__[p].bind(this)); break;
 			}
 		}
@@ -158,14 +170,13 @@ UNIT.prototype.setType = function(type){
 				case "always": this.always(typeObj.__proto__[p].bind(this)); break;
 				case "die": this.onDie.push(typeObj.__proto__[p].bind(this)); break;
 				case "kill": this.onKill.push(typeObj.__proto__[p].bind(this)); break;
-				case "birth": this.onBirth.push(typeObj.__proto__[p].bind(this)); break;
 				case "clicked": this.onClick.push(typeObj.__proto__[p].bind(this)); break;
 			}
 		}
 	};
 
 	this.setAnimation();
-	for (var i = 0; i < this.onBirth.length; ++i) {this.onBirth[i]()};
+	
 	
 	function recursiveSet(obj, key, parent){
 		if(obj[key] !== undefined && obj[key] !== null && typeof obj[key] == "object"  && !(obj[key].constructor === Array )){if (parent[key] == undefined){parent[key] = {}}; var keys = Object.keys(obj[key]); for (var i = 0; i < keys.length; i++) {recursiveSet(obj[key], keys[i], parent[key])}} else {parent[key] = obj[key]}};

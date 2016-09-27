@@ -41,7 +41,7 @@ define(function () {return function(SCENE){
 		if (prep_connect > 0) {prep_connect--}; 
 
 		if (prep_connect == 2){
-			SCENE.newUnit("main", GLOBALS.my_fighter, {
+			SCENE.newUnit("main", GLOBALS.my_character, {
 				alias: "me",
 				hidden: true,
 				locX: SCENE.getScreen().width*-1,
@@ -54,6 +54,7 @@ define(function () {return function(SCENE){
 			var my_unit = SCENE.getUnit("me");
 
 			var my_derived_stats = {
+				_actortype: GLOBALS.my_character,
 				agility: my_unit.derived.agility,
 				health_max: my_unit.derived.health,
 				stamina_max: my_unit.derived.stamina,

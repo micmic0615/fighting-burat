@@ -65,7 +65,8 @@ MMG.loadScene = function(name){
 
 			MMG.stage.sprites = {};
 
-			MMG.drawCanvas = new MMG.createCanvas("draw");
+			MMG.canvas = new MMG.createCanvas("draw");
+			MMG.ctx = MMG.canvas.getContext("2d");
 
 			DEBUG.canvas = new MMG.createCanvas("debugger");
 
@@ -137,35 +138,20 @@ MMG.render = function(){
 
 		MMG.iterator.fps += MMG.fps/60;
 		if (MMG.iterator.fps >= 1){if (MMG.stage != undefined){while(MMG.iterator.fps > 1){MMG.iterator.fps -= 1;
+			MMG.ctx.clearRect(0,0,MMG.canvas.width,MMG.canvas.height);
+
+			MMG.stage.layers.sort(keysrt("zIndex"));
+			MMG.stage.drawings.sort(keysrt("zIndex"));
+
 			for (var i = 0; i < MMG.stage.layers.length; i++) {
 				var p = MMG.stage.layers[i];
-				
-				if (p.canvas == undefined){
-					var nextSibling = null;
-					for (var i2 = 0; i2 < MMG.stage.layers.length; ++i2) {var p2 = MMG.stage.layers[i2];if (i2 != i){if (p2.zIndex > p.zIndex){nextSibling = p2}}}
-					if (nextSibling == null || nextSibling.canvas == undefined){nextSibling = {canvas: MMG.drawCanvas}}
 
-					var newCanvas = new MMG.createCanvas(p.alias, nextSibling.canvas );
-
-					p.canvas = newCanvas;
-					p.context = newCanvas.getContext('2d');
-					
-					var ctx = p.context;
-
-					MMG.stage.layers.sort(keysrt("zIndex"));
-				} else {
-					var ctx = p.context;
-				}
-				
-				
-				ctx.clearRect(0,0,p.canvas.width,p.canvas.height);	
 				if (p.bgColor != undefined){
-					ctx.fillStyle = p.bgColor;
-					ctx.fillRect(0,0,p.canvas.width,p.canvas.height);
+					MMG.ctx.fillStyle = p.bgColor;
+					MMG.ctx.fillRect(0,0,MMG.canvas.width,MMG.canvas.height);
 				};
 
 				p.units.sort(keysrt("zIndex"));
-
 				
 				for (var i2 = 0; i2 < p.units.length; i2++) {
 					var p2 = p.units[i2];
@@ -179,7 +165,7 @@ MMG.render = function(){
 						MMG.stage.sprites[spriteName] = img;
 					};
 
-					ctx.globalAlpha = p2.opacity;
+					MMG.ctx.globalAlpha = p2.opacity;
 
 					if (!p2.freeSize){
 						var sizeX = Math.round(MMG.scale(p2.width*Math.abs(p2.scaleX)));
@@ -220,16 +206,16 @@ MMG.render = function(){
 					var clipX = p2.animation.list[p2.animation.sprite].width;
 					var clipY = p2.animation.list[p2.animation.sprite].height;	
 
-					ctx.drawImage(MMG.stage.sprites[spriteName], (p2.animation.frameCurrent*p2.width), 0, clipX, clipY, posX, posY, sizeX, sizeY);
+					MMG.ctx.drawImage(MMG.stage.sprites[spriteName], (p2.animation.frameCurrent*p2.width), 0, clipX, clipY, posX, posY, sizeX, sizeY);
 					
-					ctx.globalAlpha = 1;
+					MMG.ctx.globalAlpha = 1;
 
 					p2.screen.left = hitPosX;
 					p2.screen.right = hitPosX + hitX;
 					p2.screen.top = hitPosY;
 					p2.screen.bottom = hitPosY + hitY;
 
-					if (p2.group != "ui" || p2.anchored || p2.freeSize){DEBUG_HITBOX(hitX, hitY, hitPosX, hitPosY, ctx)}
+					if (p2.group != "ui" || p2.anchored || p2.freeSize){DEBUG_HITBOX(hitX, hitY, hitPosX, hitPosY, MMG.ctx)}
 
 					if (p2.animation.frameCount > 1){
 						p2.animation.iterator += (p2.animation.fps/p2.animation.speed)/MMG.fps;
@@ -238,18 +224,13 @@ MMG.render = function(){
 				};
 			};
 
-			var drawCtx = MMG.drawCanvas.getContext('2d');
-			drawCtx.clearRect(0,0,MMG.drawCanvas.width,MMG.drawCanvas.height);
-
-			MMG.stage.drawings.sort(keysrt("zIndex"));
-
 			for (var i = 0; i < MMG.stage.drawings.length; ++i) {var p = MMG.stage.drawings[i]; if (p.type != null && p.life > 0){
 				switch (p.type){
 					case "flyingText": 
 						p.life--;
-						drawCtx.font = p.fontSize + "px " + p.fontFamily;
-						drawCtx.fillStyle = p.color;					
-						drawCtx.globalAlpha = p.life/p.life_max;
+						MMG.ctx.font = p.fontSize + "px " + p.fontFamily;
+						MMG.ctx.fillStyle = p.color;					
+						MMG.ctx.globalAlpha = p.life/p.life_max;
 
 						var life_ratio = Math.pow(p.life/p.life_max,3);
 						var radian_angle = p.angle*Math.PI/180;
@@ -257,22 +238,23 @@ MMG.render = function(){
 						p.x += Math.cos(radian_angle)*(life_ratio)*8;
 						p.y += Math.sin(radian_angle)*(life_ratio)*8;
 						p.y += 1.5;
-						var posX = Math.round(MMG.scale(p.x - drawCtx.measureText(p.text).width*0.5));
+
+						var posX = Math.round(MMG.scale(p.x - MMG.ctx.measureText(p.text).width*0.5));
 						var posY =  Math.round(MMG.scale(p.y));
 
-						drawCtx.fillText(p.text, posX, posY);
-						drawCtx.globalAlpha = 1;
+						MMG.ctx.fillText(p.text, posX, posY);
+						MMG.ctx.globalAlpha = 1;
 						break;
 
 					case "floatingText":
-						drawCtx.font = p.fontSize + "px " + p.fontFamily;
-						drawCtx.fillStyle = p.color;	
-						if (isNaN(p.opacity)){drawCtx.globalAlpha = 1} else {drawCtx.globalAlpha = p.opacity;};
+						MMG.ctx.font = p.fontSize + "px " + p.fontFamily;
+						MMG.ctx.fillStyle = p.color;	
+						if (isNaN(p.opacity)){MMG.ctx.globalAlpha = 1} else {MMG.ctx.globalAlpha = p.opacity;};
 
 						var posX = Math.round(MMG.scale(p.x));
 						var posY = Math.round(MMG.scale(p.y));
 
-						var textWidth = drawCtx.measureText(p.text).width;
+						var textWidth = MMG.ctx.measureText(p.text).width;
 
 						switch(p.textAlign){
 							case "left": var textX = posX; break;
@@ -280,8 +262,8 @@ MMG.render = function(){
 							case "center": var textX = posX - textWidth/2; break;
 						}
 
-						drawCtx.fillText(p.text, textX, posY);
-						drawCtx.globalAlpha = 1;
+						MMG.ctx.fillText(p.text, textX, posY);
+						MMG.ctx.globalAlpha = 1;
 						break;
 
 					case "rect":
@@ -296,17 +278,17 @@ MMG.render = function(){
 						p.screen.top = posY;
 						p.screen.bottom = posY + sizeY;
 
-						if (isNaN(p.opacity)){drawCtx.globalAlpha = 1} else {drawCtx.globalAlpha = p.opacity};
+						if (isNaN(p.opacity)){MMG.ctx.globalAlpha = 1} else {MMG.ctx.globalAlpha = p.opacity};
 
-						drawCtx.fillStyle = p.backgroundColor;
-						drawCtx.beginPath();
-						drawCtx.fillRect(posX,posY,sizeX,sizeY);
-						drawCtx.closePath();
-						drawCtx.globalAlpha = 1;
+						MMG.ctx.fillStyle = p.backgroundColor;
+						MMG.ctx.beginPath();
+						MMG.ctx.fillRect(posX,posY,sizeX,sizeY);
+						MMG.ctx.closePath();
+						MMG.ctx.globalAlpha = 1;
 
 						if (p.text != ""){
 							var textHeight = Math.round(MMG.scale(p.fontSize));
-							var textWidth = drawCtx.measureText(p.text).width;
+							var textWidth = MMG.ctx.measureText(p.text).width;
 							var textY = posY + sizeY/2 + textHeight/4;
 
 							switch(p.textAlign){
@@ -316,9 +298,9 @@ MMG.render = function(){
 							}
 
 
-							drawCtx.font = p.fontSize + "px " + p.fontFamily;
-							drawCtx.fillStyle = p.color;
-							drawCtx.fillText(p.text, textX, textY);
+							MMG.ctx.font = p.fontSize + "px " + p.fontFamily;
+							MMG.ctx.fillStyle = p.color;
+							MMG.ctx.fillText(p.text, textX, textY);
 							
 						}
 						break

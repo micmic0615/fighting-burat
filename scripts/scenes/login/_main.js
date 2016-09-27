@@ -34,7 +34,6 @@ define(function () {return function(SCENE){
 				height: MMG.stage.world.height,
 				backgroundColor: "#000",
 				clickable: true,
-				clicked: function(){alert("woo")}
 			})
 
 			text_input = SCENE.drawObj("rect", {

@@ -10,6 +10,7 @@ define(function () {return function(){
 	this.newLayer({zIndex:1, alias:'main'});
 	this.newLayer({zIndex:2, alias:'ui'});
 
+
 	var floor = this.newUnit("background", "floor", {
 		alias:'myFloor',
 		locX:this.getScreen().width/2,
@@ -17,14 +18,16 @@ define(function () {return function(){
 		scaleY: 2
 	})
 
-	this.newUnit("main", "knight", {
+
+
+	this.newUnit("main", GLOBALS.match_players[0].stats._actortype, {
 		alias:'hero',
 		locX:(this.getScreen().width/4)*1,
 		locY:245,
 		zIndex: 100
 	});
 	
-	this.newUnit("main", "knight", {
+	this.newUnit("main", GLOBALS.match_players[1].stats._actortype, {
 		alias:'enemy',
 		locX:(this.getScreen().width/4)*3,
 		locY:245,
@@ -135,18 +138,18 @@ define(function () {return function(){
 		bars.aggro = this.drawObj("rect", {x: 10, y: 10, width: pBars_locX - 5, height: pBars_locX - 5, backgroundColor: "f00"});
 
 		this.drawObj("rect", {x: (pBars_locX + 10), y: 10, width: 300, height: 13, backgroundColor: "#600"});
-		bars.current_health = this.drawObj("rect", {x: (pBars_locX + 10), y: 10, width: 300, height: 13, backgroundColor: "#f00"});
+		bars.current_health = this.drawObj("rect", {x: (pBars_locX + 10), y: 10, width: 300, height: 13, backgroundColor: "#f00", zIndex:2});
 
 		this.drawObj("rect", {x: (pBars_locX + 10), y: 26, width: 300, height: 7, backgroundColor: "#036"});
-		bars.current_defense = this.drawObj("rect", { x: (pBars_locX + 10), y: 26, width: 300, height: 7, backgroundColor: "#09f"});
+		bars.current_defense = this.drawObj("rect", { x: (pBars_locX + 10), y: 26, width: 300, height: 7, backgroundColor: "#09f", zIndex:2});
 		
 		for (var i = 0; i < COMBAT.blocks_max; ++i) {
 			bars["block_" + i] = this.drawObj("rect", { x: (pBars_locX + 10) + 20*i, y: 37, width: 15, height: 15, opacity: 0.25, backgroundColor: "#09f"});
 		}
 
 		this.drawObj("rect", {x: 10, y: (this.getScreen().height - 25), width: (this.getScreen().width - 20), height: 15, backgroundColor: "#606"});
-		bars.current_mana = this.drawObj("rect", {x: 10, y: (this.getScreen().height - 25), width: 0, height: 15, backgroundColor: "#f0f"});
-		texts["mana_value"] = this.drawObj("floatingText",{text:"000", color: "#fff", fontSize: 15, x: this.getScreen().width/2, y: this.getScreen().height - 12});
+		bars.current_mana = this.drawObj("rect", {x: 10, y: (this.getScreen().height - 25), width: 0, height: 15, backgroundColor: "#f0f", zIndex:3});
+		texts["mana_value"] = this.drawObj("floatingText",{text:"000", color: "#fff", fontSize: 15, x: this.getScreen().width/2, y: this.getScreen().height - 12, zIndex:3});
 
 		var my_fighter_buffs = {}
 
@@ -214,22 +217,6 @@ define(function () {return function(){
 				var p = player.buffs_current[i + COMBAT.buffs_max];
 				icons["nextbuffs_" + i].setAnimation(p)
 			}
-
-			// if (player.buffs_available.length > 0){
-			// 	var buffs_used = player.buffs_used
-			// 	var buffs_max = player.buffs_available.length
-			// 	var shuffle_cost = Math.floor(player.mana_current*(0.2 - ( 0.2 * buffs_used/buffs_max))) + 10;
-
-			// 	if (player.mana_current >= shuffle_cost){
-			// 		icons["shuffle"].opacity = 1
-			// 	} else {
-			// 		icons["shuffle"].opacity = 0.35
-			// 	}
-			// } else {
-			// 	var shuffle_cost = "-"
-			// }
-
-			// texts["shuffle" ].text = String(shuffle_cost)
 
 			for (var i = 0; i < COMBAT.buffs_use_max ; ++i) {
 				if (i < my_fighter.buffs.length){

@@ -1,5 +1,5 @@
 define(function () {var THIS_UNIT = function(){
-	this.prop("hidden", false);
+	
 	this.prop("alive", true);
 	this.prop("flying", false);
 
@@ -55,14 +55,13 @@ THIS_UNIT.prototype.birth = function(){
 	this.prop("current.stamina", this.derived.stamina);
 	this.prop("current.defense", this.derived.defense);
 	this.prop("current.block", 0);
-
-	if (!this.hidden){
-		this.prop("bars.hp_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#600", }));
-		this.prop("bars.hp_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#f00", }));
-		
-		this.prop("bars.def_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#036", }));
-		this.prop("bars.def_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#09f", }));
-	}
+	
+	this.prop("bars.hp_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#600", }));
+	this.prop("bars.hp_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#f00", zIndex:2}));
+	
+	this.prop("bars.def_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#036", }));
+	this.prop("bars.def_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#09f", zIndex:2}));
+	
 };
 
 THIS_UNIT.prototype.update_stats = function(){
@@ -255,10 +254,12 @@ THIS_UNIT.prototype.always = function(){
 		MMG.stage.update_bars(this.bars.hp_current, this_health, 1);
 		MMG.stage.update_bars(this.bars.def_current, this_defense, 1);
 	} else {
-		this.bars.hp_max.opacity = 0;
-		this.bars.def_max.opacity = 0;
-		this.bars.hp_current.opacity = 0;
-		this.bars.def_current.opacity = 0;
+		if (this.bars != undefined){
+			this.bars.hp_max.opacity = 0;
+			this.bars.def_max.opacity = 0;
+			this.bars.hp_current.opacity = 0;
+			this.bars.def_current.opacity = 0;
+		}
 	}
 }
 
@@ -321,9 +322,6 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 						}
 					}
 				}
-
-
-				
 
 				var dealt = {
 					health: turn_data.damage.target.health,

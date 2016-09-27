@@ -4,6 +4,26 @@ define(function () { return function(){
 		"enemy": initialize_stats.bind(this)("enemy", this.world.width/2 + 45),
 	};
 
+	
+	SOCKET.on("res.game_end", function(res){
+		SOCKET.emit("req.game_disconnect", GLOBALS.game_id);
+		delete GLOBALS.game_id;
+		delete GLOBALS.winner_id;
+		delete GLOBALS.turn_data;
+		delete GLOBALS.match_players;
+		RAN.clear();
+		MMG.loadScene("menu");
+	}.bind(this));
+
+	SOCKET.on("res.game_buff_send", function(res){
+		this.getUnit(res.unit_alias).prebuffs = res.buffs
+		this.turn.index = res.turn_index;
+		RAN.set_seed(res.seed_index);
+	}.bind(this));
+
+	var game_over = false;
+	var game_over_delay = 100;
+
 	function initialize_stats(alias, locX){
 		var unit = this.getUnit(alias);
 
@@ -29,25 +49,6 @@ define(function () { return function(){
 			locX: locX
 		};
 	};	
-
-	SOCKET.on("res.game_end", function(res){
-		SOCKET.emit("req.game_disconnect", GLOBALS.game_id);
-		delete GLOBALS.game_id;
-		delete GLOBALS.winner_id;
-		delete GLOBALS.turn_data;
-		delete GLOBALS.match_players;
-		RAN.clear();
-		MMG.loadScene("menu");
-	}.bind(this));
-
-	SOCKET.on("res.game_buff_send", function(res){
-		this.getUnit(res.unit_alias).prebuffs = res.buffs
-		this.turn.index = res.turn_index;
-		RAN.set_seed(res.seed_index);
-	}.bind(this));
-
-	var game_over = false;
-	var game_over_delay = 100;
 
 	function apply_buffs(unit){
 		var next_turn = this.turn.sequence[this.turn.index + 1];
@@ -467,6 +468,4 @@ define(function () { return function(){
 	};	
 
 	this.always(run_turns.bind(this));
-
-	
 }})

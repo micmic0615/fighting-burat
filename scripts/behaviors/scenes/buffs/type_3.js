@@ -1,7 +1,7 @@
 BUFFS.heal = {
 	effects:[{
 		name: "health_heal_add",
-		factor: 300,
+		factor: 280,
 	}],
 	duration: 0,
 	cost: 24,
@@ -22,9 +22,9 @@ BUFFS.heal = {
 BUFFS.regen = {
 	effects:[{
 		name: "health_heal_add",
-		factor: 12,
+		factor: 18,
 	}],
-	duration: 25,
+	duration: 18,
 	cost: 20,
 	slot: 3,
 	type: "spell",
