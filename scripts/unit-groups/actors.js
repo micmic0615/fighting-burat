@@ -24,6 +24,7 @@ define(function () {var THIS_UNIT = function(){
 	this.prop("current.health", 1);
 	this.prop("current.stamina", 1);
 	this.prop("current.defense", 1);
+	this.prop("current.negativedefense", 0);
 	this.prop("current.block", 1);
 
 	this.prop("buffs", []);

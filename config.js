@@ -69,7 +69,11 @@ var COMBAT = {
 	cast_channel_duration: 30,
 	cast_repel_factor: 2,
 
-	knockback_damage_factor: 1,
+	knockback_damage_factor: 0.75,
+
+	negative_defense_regain: 0.05,
+	negative_defense_amp_factor: 1,
+	negative_defense_amp_max: 1,
 
 	unit_movespeed: 2.5,
 
