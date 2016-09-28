@@ -1,7 +1,7 @@
 define(function () { return function(){
 	var unit_stats = {
-		"hero": initialize_stats.bind(this)("hero", this.world.width/2 - 45),
-		"enemy": initialize_stats.bind(this)("enemy", this.world.width/2 + 45),
+		"hero": initializeStats.bind(this)("hero", this.world.width/2 - 45),
+		"enemy": initializeStats.bind(this)("enemy", this.world.width/2 + 45),
 	};
 
 	
@@ -24,7 +24,7 @@ define(function () { return function(){
 	var game_over = false;
 	var game_over_delay = 100;
 
-	function initialize_stats(alias, locX){
+	function initializeStats(alias, locX){
 		var unit = this.getUnit(alias);
 
 		this.fighters[alias] = {
@@ -42,6 +42,7 @@ define(function () { return function(){
 			health: unit.current.health,
 			stamina: unit.current.stamina,
 			defense: unit.current.defense,
+			fracture: unit.current.defense,
 			block: unit.current.block,			
 			buffs: unit.buffs,
 			debuffs: unit.debuffs,
@@ -50,7 +51,7 @@ define(function () { return function(){
 		};
 	};	
 
-	function apply_buffs(unit){
+	function applyBuffs(unit){
 		var next_turn = this.turn.sequence[this.turn.index + 1];
 
 		if (unit.prebuffs.length > 0){
@@ -93,19 +94,19 @@ define(function () { return function(){
 					test_before.push(p.origin)
 				}
 
-				calculate_turns.bind(this)(this.turn.index + 1, recalc_duration);
+				calculateTurns.bind(this)(this.turn.index + 1, recalc_duration);
 
 				for (var i = this.turn.index; i < recalc_duration + this.turn.index; ++i) {
 					var p = this.turn.sequence[i];
 					test_after.push(p.origin)
 				}
 			} else {
-				evaluate_sequence.bind(this)(this.turn.index + 1)
+				evaluateSequence.bind(this)(this.turn.index + 1)
 			};
 		};
 	};
 
-	function change_turn_phase(){
+	function changeTurnPhase(){
 		var current = this.turn.sequence[this.turn.index];
 		var next = this.turn.sequence[this.turn.index + 1];
 		
@@ -120,7 +121,7 @@ define(function () { return function(){
 				for (var i2 = 0; i2 < p.sfx.length; ++i2) {
 					var p2 = p.sfx[i2];
 					if (p2.trigger == "spell"){
-						var sfx_dummy = this.get_sfx_dummy();
+						var sfx_dummy = this.getDummySFX();
 				
 						if (p2.unit == "origin"){sfx_dummy.unit = b} 
 						else {
@@ -141,12 +142,12 @@ define(function () { return function(){
 		if (this.turn.phase > 3){						
 			this.turn.index++; 
 			this.turn.phase = 0; 
-			if (this.turn.index + this.turn.foresight > this.turn.sequence.length){calculate_turns.bind(this)()};
+			if (this.turn.index + this.turn.foresight > this.turn.sequence.length){calculateTurns.bind(this)()};
 			if (this.player.mana_current + this.player.mana_regen >=  this.player.mana_max){this.player.mana_current = this.player.mana_max} else {this.player.mana_current += this.player.mana_regen};
 		};
 	};
 	
-	function calculate_turns(index, splice) {
+	function calculateTurns(index, splice) {
 		var units = {};
 		var turn_agility = 0;
 
@@ -204,6 +205,7 @@ define(function () { return function(){
 				health: 0,
 				defense: 0,
 				stamina: 0,
+				fracture: 0,
 				leech_health: 0
 			};
 
@@ -224,7 +226,7 @@ define(function () { return function(){
 
 		if (index == undefined) {
 			for (var i = 0; i < temp_sequence.length; ++i) { this.turn.sequence.push(temp_sequence[i]) };
-			evaluate_sequence.bind(this)(0);
+			evaluateSequence.bind(this)(0);
 		} else {
 			var index_base = index;
 
@@ -235,11 +237,11 @@ define(function () { return function(){
 				index++
 			};
 
-			evaluate_sequence.bind(this)(index_base);
+			evaluateSequence.bind(this)(index_base);
 		}
 	};
 
-	function evaluate_sequence(index) {
+	function evaluateSequence(index) {
 		var current = this.turn.sequence[index];
 		var next = this.turn.sequence[index + 1];
 
@@ -305,10 +307,6 @@ define(function () { return function(){
 					stamina_dmg_multiply: 1,
 					force_multiply: 1,
 					reduce_dmg_subtract: 0,
-
-					debuff_bleed_add: 0,
-					debuff_encumber_add: 0,
-					debuff_poison_add: 0,
 				};
 
 				for (var i = 0; i < current.unit_stats[b].buffs.length; ++i) {
@@ -370,19 +368,19 @@ define(function () { return function(){
 
 			current.evaluated = true;	
 
-			this["action_" + action](index, buff_effects);
+			this["action" + action.toUpperFirst()](index, buff_effects);
 		}
 
 		index++
-		if (index < this.turn.sequence.length - 3) { evaluate_sequence.bind(this)(index) };
+		if (index < this.turn.sequence.length - 3) { evaluateSequence.bind(this)(index) };
 	};
 
-	function run_turns(){
+	function runTurns(){
 		if (MMG.stage == undefined) return null;
 		
 		if (this.turn.sequence.length == 0){
-			while(this.turn.sequence.length < this.turn.foresight - this.turn.sequence_max){calculate_turns.bind(this)()};
-			calculate_turns.bind(this)();
+			while(this.turn.sequence.length < this.turn.foresight - this.turn.sequence_max){calculateTurns.bind(this)()};
+			calculateTurns.bind(this)();
 		} else {
 			if (!game_over){
 				var current = this.turn.sequence[this.turn.index];
@@ -394,17 +392,20 @@ define(function () { return function(){
 			
 				switch(this.turn.phase){
 					case -1:
-						if (Math.abs(origin.locX - target.locX) < COMBAT.attack_distance){change_turn_phase.bind(this)()} else {origin.walk_forward(); target.walk_forward()};
+						if (Math.abs(origin.locX - target.locX) < COMBAT.attack_distance){changeTurnPhase.bind(this)()} else {origin.walkForward(); target.walkForward()};
 						break
-					case 0: 						
-						origin.set_stats(current.unit_stats[current.origin]);
-						target.set_stats(current.unit_stats[current.target]);
-						change_turn_phase.bind(this)();
+					case 0: 
+								
+						origin.setStats(current.unit_stats[current.origin]);
+						target.setStats(current.unit_stats[current.target]);
+				
+						
+						changeTurnPhase.bind(this)();
 						break;
 
 					case 1:
 						var listener = origin[current.action](target, current);
-						if (listener.origin && listener.target){change_turn_phase.bind(this)()};
+						if (listener.origin && listener.target){changeTurnPhase.bind(this)()};
 						break;
 
 					case 2:
@@ -412,12 +413,12 @@ define(function () { return function(){
 							case "attack":
 								var next_origin = this.getUnit(next_turn.origin);
 								var next_target = this.getUnit(next_turn.target);
-								if (Math.abs(next_origin.locX - next_target.locX) > COMBAT.attack_distance){next_origin.face_location(next_target.locX); next_origin.walk_forward()} else {change_turn_phase.bind(this)()};								
+								if (Math.abs(next_origin.locX - next_target.locX) > COMBAT.attack_distance){next_origin.faceLocation(next_target.locX); next_origin.walkForward()} else {changeTurnPhase.bind(this)()};								
 								break
 							
 							case "cast":
 							case "skip":
-								change_turn_phase.bind(this)();
+								changeTurnPhase.bind(this)();
 								break
 						}
 						break
@@ -434,10 +435,10 @@ define(function () { return function(){
 							this.getUnit(GLOBALS.my_fighter).queuebuffs = [];
 						};
 
-						apply_buffs.bind(this)(origin);
-						apply_buffs.bind(this)(target);
+						applyBuffs.bind(this)(origin);
+						applyBuffs.bind(this)(target);
 						
-						change_turn_phase.bind(this)();
+						changeTurnPhase.bind(this)();
 						
 						break;
 				};
@@ -467,5 +468,5 @@ define(function () { return function(){
 		};
 	};	
 
-	this.always(run_turns.bind(this));
+	this.always(runTurns.bind(this));
 }})

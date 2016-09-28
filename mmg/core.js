@@ -279,7 +279,7 @@ MMG.render = function(){
 						p.screen.bottom = posY + sizeY;
 
 						if (isNaN(p.opacity)){MMG.ctx.globalAlpha = 1} else {MMG.ctx.globalAlpha = p.opacity};
-
+						
 						MMG.ctx.fillStyle = p.backgroundColor;
 						MMG.ctx.beginPath();
 						MMG.ctx.fillRect(posX,posY,sizeX,sizeY);
@@ -287,6 +287,8 @@ MMG.render = function(){
 						MMG.ctx.globalAlpha = 1;
 
 						if (p.text != ""){
+							MMG.ctx.font = p.fontSize + "px " + p.fontFamily;
+							
 							var textHeight = Math.round(MMG.scale(p.fontSize));
 							var textWidth = MMG.ctx.measureText(p.text).width;
 							var textY = posY + sizeY/2 + textHeight/4;
@@ -298,7 +300,6 @@ MMG.render = function(){
 							}
 
 
-							MMG.ctx.font = p.fontSize + "px " + p.fontFamily;
 							MMG.ctx.fillStyle = p.color;
 							MMG.ctx.fillText(p.text, textX, textY);
 							

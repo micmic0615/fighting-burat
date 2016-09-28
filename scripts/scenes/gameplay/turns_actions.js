@@ -1,5 +1,5 @@
 define(function () {return function(){
-	this["__proto__"].action_attack = function(index, buff_effects){
+	this["__proto__"].actionAttack = function(index, buff_effects){
 		var current = this.turn.sequence[index];
 		var next = this.turn.sequence[index + 1];
 
@@ -12,13 +12,13 @@ define(function () {return function(){
 			var damage_health_factor = 0;
 			var damage_defense_factor = 1;
 			var push_resist = 2;
-			var defense_spill_factor = 1
+			var defense_spill_factor = 1.25
 			next.unit_stats[target].block--;
 		} else {
 			var damage_health_factor = 0.5;
 			var damage_defense_factor = 0.5;
 			var push_resist = 1;
-			var defense_spill_factor = 1.5
+			var defense_spill_factor = 1.25
 		}
 
 		if (Math.round(damage_total * damage_defense_factor) >= current.unit_stats[target].defense) {
@@ -29,9 +29,17 @@ define(function () {return function(){
 			var damage_defense_spill = 0;
 		}
 
-		current.damage.target.defense += buff_effects[origin].defense_dmg_add;
+		current.damage.target.defense += buff_effects[origin].defense_dmg_add;		
+		
 		current.damage.target.defense *= buff_effects[origin].defense_dmg_multiply;
-		if (Math.round(current.damage.target.defense) >= current.unit_stats[target].defense) { current.damage.target.defense = current.unit_stats[target].defense }
+		if (current.damage.target.defense >= current.unit_stats[target].defense) { 			
+			current.damage.target.fracture = current.damage.target.defense - current.unit_stats[target].defense;
+			current.damage.target.defense = current.unit_stats[target].defense;
+
+			if (current.damage.target.fracture >= current.unit_stats[target].fracture){
+				current.damage.target.fracture = current.unit_stats[target].fracture;
+			}
+		}
 
 		current.damage.target.health = Math.round((damage_total * damage_health_factor) + damage_defense_spill);
 		current.damage.target.health += buff_effects[origin].health_dmg_add;
@@ -70,17 +78,32 @@ define(function () {return function(){
 			next.unit_stats[origin].locX = current.unit_stats[origin].locX;
 		}
 
-		current.damage.target.health = Math.round(current.damage.target.health);
+		var fracture_amp = 1 + (COMBAT.fracture_amp_max - COMBAT.fracture_amp_max*(current.damage.target.fracture / this.fighters[target].defense_max));
+
+		current.damage.target.health = Math.round(current.damage.target.health * fracture_amp);
 		current.damage.target.stamina = Math.round(current.damage.target.stamina);
 		current.damage.target.defense = Math.round(current.damage.target.defense);
+		current.damage.target.fracture = Math.round(current.damage.target.fracture);
 
 		next.unit_stats[target].health -= current.damage.target.health;
 		next.unit_stats[target].stamina -= current.damage.target.stamina;
 		next.unit_stats[target].defense -= current.damage.target.defense;
 
+		if (next.unit_stats[target].defense <= 0){
+			next.unit_stats[target].fracture -= current.damage.target.fracture;
+			var fracture_regain = this.fighters[target].defense_max*COMBAT.fracture_regain;
+			if (next.unit_stats[target].fracture + fracture_regain < this.fighters[target].defense_max){next.unit_stats[target].fracture += fracture_regain} else {next.unit_stats[target].fracture = this.fighters[target].defense_max};
+		} else {
+			current.damage.target.fracture = 0;
+			next.unit_stats[target].fracture = this.fighters[target].defense_max
+		}		
+		
 		current.damage.origin.health = Math.round(buff_effects[target].health_dmg_reflect_add);
 		current.damage.origin.defense = Math.round(buff_effects[target].defense_dmg_reflect_add);		
-		if (next.unit_stats[origin].defense - current.damage.origin.defense <= 0){current.damage.origin.defense = next.unit_stats[origin].defense};
+		if (current.damage.origin.defense >= next.unit_stats[origin].defense){
+			current.damage.origin.fracture = current.damage.origin.defense - next.unit_stats[origin].defense;
+			current.damage.origin.defense = next.unit_stats[origin].defense;
+		};
 
 		current.damage.origin.leech_health = Math.round(buff_effects[origin].lifesteal_add);
 
@@ -90,9 +113,21 @@ define(function () {return function(){
 			next.unit_stats[origin].health += current.damage.origin.leech_health;
 		}
 
+		
+
 		next.unit_stats[origin].health -= current.damage.origin.health;
 		next.unit_stats[origin].defense -= current.damage.origin.defense;
 		next.unit_stats[origin].stamina -= this.fighters[origin].stamina_cost;
+
+		if (next.unit_stats[origin].defense <= 0){
+			next.unit_stats[origin].fracture -= current.damage.origin.fracture;
+			var fracture_regain = this.fighters[origin].defense_max*COMBAT.fracture_regain;
+			if (next.unit_stats[origin].fracture + fracture_regain < this.fighters[origin].defense_max){next.unit_stats[origin].fracture += fracture_regain} else {next.unit_stats[origin].fracture = this.fighters[origin].defense_max};
+		} else {
+			current.damage.origin.fracture = 0;
+			next.unit_stats[origin].fracture = this.fighters[origin].defense_max;
+		}
+		
 
 		for (var i = 0; i < next.unit_stats[origin].buffs.length; ++i) {
 			var p = next.unit_stats[origin].buffs[i];
@@ -113,7 +148,7 @@ define(function () {return function(){
 		};
 	}
 
-	this["__proto__"].action_cast = function(index){
+	this["__proto__"].actionCast = function(index){
 		var current = this.turn.sequence[index];
 		var next = this.turn.sequence[index + 1];
 
@@ -140,7 +175,7 @@ define(function () {return function(){
 		}
 	}
 
-	this["__proto__"].action_skip = function(index){
+	this["__proto__"].actionSkip = function(index){
 
 	
 		

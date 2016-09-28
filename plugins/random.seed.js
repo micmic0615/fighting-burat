@@ -11,6 +11,8 @@ mmj_random_seed.prototype.generate = function(seed){
 mmj_random_seed.prototype.get = function(){
 	if (this.seed[this.seed_index] != undefined){
 		var random_return = this.seed[this.seed_index];
+		if (random_return >= 1){random_return = 0.999};
+		if (random_return <= 0){random_return = 0.001};
 		this.seed_index++;
 		return random_return;
 	} else {

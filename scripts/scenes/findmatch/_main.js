@@ -69,6 +69,7 @@ define(function () {return function(SCENE){
 				health: my_unit.current.health,
 				stamina: my_unit.current.stamina,
 				defense: my_unit.current.defense,
+				fracture:  my_unit.current.defense,
 				block: my_unit.current.block,			
 				buffs: my_unit.buffs,
 				debuffs: my_unit.debuffs,

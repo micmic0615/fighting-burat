@@ -12,7 +12,7 @@ define(function () {return function(SCENE){
 		init_socket();
 	});
 
-	function io_register(text){
+	function ioRegister(text){
 		if (USER != null){
 			USER.name = text;
 			SOCKET.emit('req.user_login', USER);
@@ -48,7 +48,7 @@ define(function () {return function(SCENE){
 				text:'input your name then press [ENTER]',
 				textAlign: "center",
 				clickable: true,
-				clicked: function(){keyboard_init(text_input)}
+				clicked: function(){keyboardInit(text_input)}
 			});
 
 			SCENE.drawObj("rect", {
@@ -77,7 +77,7 @@ define(function () {return function(SCENE){
 				zIndex: 1,
 				text:'LOG-IN',
 				textAlign: "center",
-				clicked: go_to_menu
+				clicked: goToMenu
 			});
 
 			if (localStorage.getItem("burat_user") != undefined){
@@ -98,39 +98,39 @@ define(function () {return function(SCENE){
 	})
 
 
-	function go_to_menu(){
+	function goToMenu(){
 		if (KEYS.text == ""){KEYS.text = "boring user no. " + new Date().getTime()};
-		io_register(KEYS.text);
+		ioRegister(KEYS.text);
 	}
 
-	function keyboard_init(text_input){
-		update_text();
+	function keyboardInit(text_input){
+		updateText();
 		try {
 			var text = "";
 			Cocoon.Dialog.showKeyboard({type: Cocoon.Dialog.keyboardType.TEXT}, {
 				insertText: function(inserted) {
 					text += inserted;
 					KEYS.text = text;
-					update_text();
+					updateText();
 				},
 				deleteBackward: function() {
 					text = text.slice(0, text.length - 1);
 					KEYS.text = text;
-					update_text();
+					updateText();
 				},
 				done: function() {},
 				cancel: function() {}
 			});
 		} catch(err){
 			KEYS.start(function(inserted){
-				if (inserted == "ENTER"){go_to_menu()} 
-				else {update_text()};
+				if (inserted == "ENTER"){goToMenu()} 
+				else {updateText()};
 			});
 		};
 
 		
 
-		function update_text(){
+		function updateText(){
 			if (KEYS.text ==  ""){
 				text_input.text = "input your name then press [ENTER]";
 				text_input.color = "#bbb";

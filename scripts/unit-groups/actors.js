@@ -24,7 +24,7 @@ define(function () {var THIS_UNIT = function(){
 	this.prop("current.health", 1);
 	this.prop("current.stamina", 1);
 	this.prop("current.defense", 1);
-	this.prop("current.negativedefense", 0);
+	this.prop("current.fracture", 1);
 	this.prop("current.block", 1);
 
 	this.prop("buffs", []);
@@ -50,22 +50,24 @@ define(function () {var THIS_UNIT = function(){
 THIS_UNIT.prototype.birth = function(){
 	if (MMG.stage == undefined) return null;
 
-	this.update_stats();
+	this.updateStats();
 
 	this.prop("current.health", this.derived.health);
 	this.prop("current.stamina", this.derived.stamina);
 	this.prop("current.defense", this.derived.defense);
 	this.prop("current.block", 0);
 	
-	this.prop("bars.hp_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#600", }));
+	this.prop("bars.hp_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#600", zIndex:0}));
 	this.prop("bars.hp_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 175, width: 80, height: 5, backgroundColor: "#f00", zIndex:2}));
 	
-	this.prop("bars.def_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#036", }));
+	this.prop("bars.def_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#036", zIndex:0}));
 	this.prop("bars.def_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#09f", zIndex:2}));
+
+	this.prop("bars.fracture_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#f0c", zIndex:10}));
 	
 };
 
-THIS_UNIT.prototype.update_stats = function(){
+THIS_UNIT.prototype.updateStats = function(){
 	if (MMG.stage == undefined) return null;
 
 	this.prop("derived.health", (this.primary.vig * 50) + 500);
@@ -86,12 +88,14 @@ THIS_UNIT.prototype.update_stats = function(){
 	this.prop("derived.damage", this.gear.weapon.atk + (this.gear.weapon.bns * this.primary.str));
 };
 
-THIS_UNIT.prototype.set_stats = function(stats){
+THIS_UNIT.prototype.setStats = function(stats){
 	if (MMG.stage == undefined) return null;
 
 	this.current.health = stats.health;
 	this.current.stamina = stats.stamina;
 	this.current.defense = stats.defense;
+	this.current.fracture = stats.fracture;
+
 	this.current.block = stats.block;
 	this.buffs = stats.buffs;
 	this.staminaregen = stats.staminaregen;
@@ -194,24 +198,22 @@ THIS_UNIT.prototype.set_stats = function(stats){
 	}
 }
 
-THIS_UNIT.prototype.take_damage = function(origin, damage_data){
-
-	
-	
+THIS_UNIT.prototype.takeDamage = function(origin, damage_data){
 	if (MMG.stage == undefined) return null;
 
-	this.current.health -= damage_data.health;
-	this.current.defense -= damage_data.defense;
+	this.current.health -= damage_data.health;	
 	this.current.stamina -= damage_data.stamina;
+	this.current.defense -= damage_data.defense;
+	this.current.fracture -= damage_data.fracture;
 
 	if (this.locX > origin.locX){ var push_direction = 1 } else { var push_direction = -1 };
 	var randomizer = Math.random()*45*push_direction + 15*push_direction;
 
 	if (damage_data.health >= damage_data.defense){
 		if (damage_data.health > 0){
-			MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: 24, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer});
-			randomizer+=  20*push_direction;
-			MMG.stage.drawObj("flyingText", {text: damage_data.defense + "!", color: "#09f", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer})
+			if (damage_data.health > 0){MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: 24, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer});
+			randomizer+=  20*push_direction};
+			if (damage_data.defense > 0){MMG.stage.drawObj("flyingText", {text: damage_data.defense + "!", color: "#09f", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer})}
 		};	
 	} else {
 		if (damage_data.health > 0){MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})};
@@ -225,7 +227,7 @@ THIS_UNIT.prototype.take_damage = function(origin, damage_data){
 }
 
 
-THIS_UNIT.prototype.face_location = function(location){
+THIS_UNIT.prototype.faceLocation = function(location){
 	if (MMG.stage == undefined) return null;
 
 	if (location.locX > this.locX){this.scaleX = 1} else if (location.locX < this.locX){this.scaleX = -1}
@@ -247,19 +249,22 @@ THIS_UNIT.prototype.always = function(){
 
 		this.bars.hp_current.x = this.locX - 40;
 		this.bars.def_current.x = this.locX - 40;
+		this.bars.fracture_current.x = this.locX - 40;
 
 		var this_health = Math.round(80 * (this.current.health / this.derived.health));
 		var this_defense = Math.round(80 * (this.current.defense / this.derived.defense));
-		var this_stamina = Math.round(80 * (this.current.stamina / this.derived.stamina));
+		var this_fracture = Math.round(80 - (80 * (this.current.fracture / this.derived.defense)));
 
-		MMG.stage.update_bars(this.bars.hp_current, this_health, 1);
-		MMG.stage.update_bars(this.bars.def_current, this_defense, 1);
+		MMG.stage.updateBars(this.bars.hp_current, this_health, 1);
+		MMG.stage.updateBars(this.bars.def_current, this_defense, 1);
+		MMG.stage.updateBars(this.bars.fracture_current, this_fracture, 1);
 	} else {
 		if (this.bars != undefined){
 			this.bars.hp_max.opacity = 0;
 			this.bars.def_max.opacity = 0;
 			this.bars.hp_current.opacity = 0;
 			this.bars.def_current.opacity = 0;
+			this.bars.fracture_current.opacity = 0;
 		}
 	}
 }
@@ -287,7 +292,7 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 					for (var i2 = 0; i2 < p.sfx.length; ++i2) {
 						var p2 = p.sfx[i2];
 						if (p2.trigger == "attack"){
-							var sfx_dummy = MMG.stage.get_sfx_dummy();
+							var sfx_dummy = MMG.stage.getDummySFX();
 
 							if(this.alias == "hero"){sfx_dummy.scaleX == 1} else {sfx_dummy.scaleX == -1};
 					
@@ -308,7 +313,7 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 					for (var i2 = 0; i2 < p.sfx.length; ++i2) {
 						var p2 = p.sfx[i2];
 						if (p2.trigger == "defend"){
-							var sfx_dummy = MMG.stage.get_sfx_dummy();
+							var sfx_dummy = MMG.stage.getDummySFX();
 							
 							if(target.alias == "hero"){sfx_dummy.scaleX == 1} else {sfx_dummy.scaleX == -1};
 					
@@ -328,17 +333,19 @@ THIS_UNIT.prototype.attack = function(target, turn_data){
 					health: turn_data.damage.target.health,
 					defense: turn_data.damage.target.defense,
 					stamina: turn_data.damage.target.stamina,
+					fracture: turn_data.damage.target.fracture,
 				};	
 				
-				target.take_damage(this, dealt); 
+				target.takeDamage(this, dealt); 
 
 				var returned = {
 					health: turn_data.damage.origin.health,
 					defense: turn_data.damage.origin.defense,
 					stamina: turn_data.damage.origin.stamina,
+					fracture: turn_data.damage.origin.fracture,
 				};
 
-				this.take_damage(target, returned);
+				this.takeDamage(target, returned);
 				this.temp.damage_dealt = true;
 
 				if(turn_data.damage.origin.leech_health > 0){
@@ -420,7 +427,7 @@ THIS_UNIT.prototype.cast = function(target, turn_data){
 		
 	} else {
 		if (this.temp.channel_time > 0){
-			target.walk_backwards(COMBAT.cast_repel_factor)
+			target.walkBackward(COMBAT.cast_repel_factor)
 		} 
 
 		if (this.temp.cast_time > 0){
@@ -508,7 +515,7 @@ THIS_UNIT.prototype.flinch = function(origin, turn_data){
 	return listener
 }
 
-THIS_UNIT.prototype.walk_forward = function(fixed){
+THIS_UNIT.prototype.walkForward = function(fixed){
 	if (MMG.stage == undefined) return null;
 
 	if (this.action == null){
@@ -532,7 +539,7 @@ THIS_UNIT.prototype.walk_forward = function(fixed){
 	return {origin: true, target: true};
 }
 
-THIS_UNIT.prototype.walk_backwards = function(fixed){
+THIS_UNIT.prototype.walkBackward = function(fixed){
 	if (MMG.stage == undefined) return null;
 	
 	if (this.action == null){

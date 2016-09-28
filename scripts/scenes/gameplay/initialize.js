@@ -44,17 +44,17 @@ define(function () {return function(){
 
 	var my_fighter = this.getUnit(GLOBALS.my_fighter);
 
-	generate_icons.bind(this)();
+	generateIcons.bind(this)();
 	
 	while(player.buffs_current.length < COMBAT.buffs_max + COMBAT.buffs_foresight){
-		this.buff_shuffle("init")
+		this.buffShuffle("init")
 	}
 
-	function click_icon(icon_name){
-		this.buff_my_fighter(icons[icon_name].animation.sprite, icons[icon_name].alias)
+	function clickIcon(icon_name){
+		this.buffMyFighter(icons[icon_name].animation.sprite, icons[icon_name].alias)
 	}
 
-	function generate_icons(){
+	function generateIcons(){
 		for (var i = 0; i < COMBAT.buffs_max; ++i) {
 			icons["buffs_" + i] = this.newUnit("ui", "buff_icons", {
 				alias:"buffs_" + i, clickable: true, freeSize: true, anchored: true,
@@ -65,7 +65,7 @@ define(function () {return function(){
 				opacity:1,
 			});
 
-			icons["buffs_" + i].clicked = click_icon.bind(this, "buffs_" + i);
+			icons["buffs_" + i].clicked = clickIcon.bind(this, "buffs_" + i);
 
 			texts["buffs_" + i] = this.drawObj("floatingText",{text:"", color: "#f0f", fontSize: 16, x: 15 + ( i * ( 95 ) ), y: this.getScreen().height - 105});
 		}
@@ -177,7 +177,7 @@ define(function () {return function(){
 		texts["enemy_name"] = this.drawObj("floatingText",{text: GLOBALS.match_players[1].name, color: enemy_color, fontSize: 12, x: this.getUnit("enemy").locX , y: this.getUnit("enemy").locY - 75, textAlign: "center"});
 	}
 
-	function update_always(){
+	function updateAlways(){
 		if (player.reload <= 10 && player.reload > 0) {
 			player.reload--;
 		} else if (player.reload == 0) {
@@ -259,9 +259,9 @@ define(function () {return function(){
 		var bar_defense = Math.round(300 * (my_fighter.current.defense / my_fighter.derived.defense));
 		var bar_mana = (Math.round((this.getScreen().width - 20)) * (player.mana_current / player.mana_max));
 
-		this.update_bars(bars.current_health, bar_health, 2);
-		this.update_bars(bars.current_defense, bar_defense, 1);
-		this.update_bars(bars.current_mana, bar_mana, 6);
+		this.updateBars(bars.current_health, bar_health, 2);
+		this.updateBars(bars.current_defense, bar_defense, 1);
+		this.updateBars(bars.current_mana, bar_mana, 6);
 
 		texts["mana_value"].text = Math.floor(player.mana_current)
 
@@ -283,5 +283,5 @@ define(function () {return function(){
 	menu_btn.setAnimation("menu")
 	menu_btn.clicked = function(){player.reload = 10};
 
-	this.always(update_always.bind(this));
+	this.always(updateAlways.bind(this));
 }})
