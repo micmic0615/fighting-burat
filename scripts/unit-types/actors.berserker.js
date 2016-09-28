@@ -1,23 +1,23 @@
 define(function () {var THIS_UNIT = function(){
 	this.prop("group", "actors");	
 
-	this.prop("primary.vig", 18);
+	this.prop("primary.vig", 15);
 	this.prop("primary.end", 6);
 	this.prop("primary.str", 18);
 	this.prop("primary.vit", 10);
 	
-	this.prop("gear.head", {name:"unarmored", def:300, poise:25, weight:4});
-	this.prop("gear.torso", {name:"unarmored", def:300, poise:25, weight:4});
-	this.prop("gear.arms", {name:"unarmored", def:300, poise:25, weight:4});
-	this.prop("gear.legs", {name:"unarmored", def:300, poise:25, weight:4});
-	this.prop("gear.weapon", {name:"basic_sword", atk:50, bns:5, cost:10, force:30, weight:5});
+	this.prop("gear.head", {name:"unarmored", def:500, poise:25, weight:4});
+	this.prop("gear.torso", {name:"unarmored", def:500, poise:25, weight:4});
+	this.prop("gear.arms", {name:"unarmored", def:500, poise:25, weight:4});
+	this.prop("gear.legs", {name:"unarmored", def:500, poise:25, weight:4});
+	this.prop("gear.weapon", {name:"basic_sword", atk:50, bns:5, cost:10, force:60, weight:5});
 
 	var animation_frame = {file:['shitty_wizard.png', 'shitty_wizard.png'], width:400, height:400, colliderWidth:80, colliderHeight:120, frames:1, fps:12};
 
 	animation_frame.file = ['berserker/attack.png', 'berserker/attack-reverse.png']; animation_frame.frames = 5;
 	this.prop("animation.list.attack", JSON.parse(JSON.stringify(animation_frame)));
 
-	animation_frame.file = ['berserker/counter.png', 'berserker/counter-reverse.png']; animation_frame.frames = 4;
+	animation_frame.file = ['berserker/counter.png', 'berserker/counter-reverse.png']; animation_frame.frames = 6;
 	this.prop("animation.list.counter", JSON.parse(JSON.stringify(animation_frame)));
 	
 	animation_frame.file = ['berserker/flinch.png', 'berserker/flinch-reverse.png']; animation_frame.frames = 2;

@@ -99,7 +99,20 @@ define(function () {return function(SCENE){
 
 
 	function goToMenu(){
-		if (KEYS.text == ""){KEYS.text = "boring user no. " + new Date().getTime()};
+		var random_shit = [
+			"boring_user",
+			"i_have_no_lyf",
+			"weabo_man",
+			"fucking_johnny",
+			"loser_shit",
+			"kathniel_4ever",
+			"i_suck_dick"
+		]
+
+		var random_name = Math.floor(Math.random()*random_shit.length);
+		if (random_name > random_shit.length - 1){random_name = random_shit.length - 1}
+
+		if (KEYS.text == ""){KEYS.text = random_shit[random_name]};
 		ioRegister(KEYS.text);
 	}
 

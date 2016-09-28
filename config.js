@@ -71,7 +71,7 @@ var COMBAT = {
 
 	knockback_damage_factor: 0.75,
 
-	fracture_regain: 0.0625,
+	fracture_regain: 0.05,
 	fracture_amp_max: 1,
 
 	unit_movespeed: 2.5,

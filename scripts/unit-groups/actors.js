@@ -63,7 +63,7 @@ THIS_UNIT.prototype.birth = function(){
 	this.prop("bars.def_max", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#036", zIndex:0}));
 	this.prop("bars.def_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#09f", zIndex:2}));
 
-	this.prop("bars.fracture_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 80, height: 3, backgroundColor: "#f0c", zIndex:10}));
+	this.prop("bars.fracture_current", MMG.stage.drawObj( "rect", {x: this.locX, y: 182, width: 0, height: 3, backgroundColor: "#f0c", zIndex:10}));
 	
 };
 
@@ -210,17 +210,24 @@ THIS_UNIT.prototype.takeDamage = function(origin, damage_data){
 	var randomizer = Math.random()*45*push_direction + 15*push_direction;
 
 	if (damage_data.health >= damage_data.defense){
-		if (damage_data.health > 0){
-			if (damage_data.health > 0){MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: 24, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer});
-			randomizer+=  20*push_direction};
-			if (damage_data.defense > 0){MMG.stage.drawObj("flyingText", {text: damage_data.defense + "!", color: "#09f", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer})}
-		};	
+		var health_size = 24;
+		var defense_size = 14;
 	} else {
-		if (damage_data.health > 0){MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})};
-		randomizer+=  20*push_direction;
+		var health_size = 24;
+		var defense_size = 14;
+	}
 
-		if (damage_data.defense > 0){MMG.stage.drawObj("flyingText", {text: damage_data.defense + "!", color: "#09f", fontSize: 24, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})};	
-		randomizer+=  20*push_direction;
+	var fracture_amp = Math.round((1 - (this.current.fracture/this.derived.defense))*100)
+
+	if (damage_data.health > 0){MMG.stage.drawObj("flyingText", {text: damage_data.health + "!", color: "#f00", fontSize: health_size, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})};
+	randomizer+=  20*push_direction;
+
+	if (damage_data.defense > 0){MMG.stage.drawObj("flyingText", {text: damage_data.defense + "!", color: "#09f", fontSize: defense_size, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})};	
+	randomizer+=  20*push_direction;
+
+	if (damage_data.health > 0){
+		if (fracture_amp > 0){MMG.stage.drawObj("flyingText", {text: "+" + fracture_amp + "%", color: "#f0c", fontSize: 10, life: 100, x: this.locX, y: this.locY, angle: 260 + randomizer}); 
+		randomizer+=  20*push_direction};
 	}
 
 	if (damage_data.stamina > 0){MMG.stage.drawObj("flyingText", {text: "-brv!", color: "#27595c", fontSize: 12, life: 100, x: this.locX, y: this.locY, angle: 270 + randomizer})}

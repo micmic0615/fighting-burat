@@ -78,25 +78,30 @@ define(function () {return function(){
 			next.unit_stats[origin].locX = current.unit_stats[origin].locX;
 		}
 
-		var fracture_amp = 1 + (COMBAT.fracture_amp_max - COMBAT.fracture_amp_max*(current.damage.target.fracture / this.fighters[target].defense_max));
+		
+		var fracture_amp = 1;
+
+		if (next.unit_stats[target].defense <= 0){			
+			current.damage.target.fracture = Math.round(current.damage.target.fracture);
+			next.unit_stats[target].fracture -= current.damage.target.fracture;
+			var fracture_regain = this.fighters[target].defense_max*COMBAT.fracture_regain;
+			if (next.unit_stats[target].fracture + fracture_regain < this.fighters[target].defense_max){next.unit_stats[target].fracture += fracture_regain} else {next.unit_stats[target].fracture = this.fighters[target].defense_max};
+
+			fracture_amp += (COMBAT.fracture_amp_max - COMBAT.fracture_amp_max*(next.unit_stats[target].fracture / this.fighters[target].defense_max));
+		} else {
+			current.damage.target.fracture = 0;
+			next.unit_stats[target].fracture = this.fighters[target].defense_max;
+		}	
 
 		current.damage.target.health = Math.round(current.damage.target.health * fracture_amp);
 		current.damage.target.stamina = Math.round(current.damage.target.stamina);
 		current.damage.target.defense = Math.round(current.damage.target.defense);
-		current.damage.target.fracture = Math.round(current.damage.target.fracture);
 
 		next.unit_stats[target].health -= current.damage.target.health;
 		next.unit_stats[target].stamina -= current.damage.target.stamina;
 		next.unit_stats[target].defense -= current.damage.target.defense;
 
-		if (next.unit_stats[target].defense <= 0){
-			next.unit_stats[target].fracture -= current.damage.target.fracture;
-			var fracture_regain = this.fighters[target].defense_max*COMBAT.fracture_regain;
-			if (next.unit_stats[target].fracture + fracture_regain < this.fighters[target].defense_max){next.unit_stats[target].fracture += fracture_regain} else {next.unit_stats[target].fracture = this.fighters[target].defense_max};
-		} else {
-			current.damage.target.fracture = 0;
-			next.unit_stats[target].fracture = this.fighters[target].defense_max
-		}		
+			
 		
 		current.damage.origin.health = Math.round(buff_effects[target].health_dmg_reflect_add);
 		current.damage.origin.defense = Math.round(buff_effects[target].defense_dmg_reflect_add);		

@@ -176,8 +176,8 @@ define(function () {return function(SCENE){
 					char_buffs = [
 						"defense",
 						"thorns",
-						"armorbreak",
-						"armorbreak",
+						"regen",
+						"heal",
 						"armorbreak",
 						"acid",
 						"vanguard",
@@ -192,9 +192,9 @@ define(function () {return function(SCENE){
 					char_desc.text = "Skills are attack focused. Willing to use hp to deal more damage.";
 					char_buffs = [
 						"damage",
-						"transmute",
-						"transmute",
-						"transmute",
+						"agility",
+						"armorbreak",
+						"thorns",
 						"lifesteal",
 						"bleed",
 						"focus",

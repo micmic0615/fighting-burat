@@ -6,11 +6,11 @@ define(function () {var THIS_UNIT = function(){
 	this.prop("primary.str", 10);
 	this.prop("primary.vit", 10);
 	
-	this.prop("gear.head", {name:"unarmored", def:1000, poise:25, weight:6});
-	this.prop("gear.torso", {name:"unarmored", def:1000, poise:25, weight:6});
-	this.prop("gear.arms", {name:"unarmored", def:1000, poise:25, weight:6});
-	this.prop("gear.legs", {name:"unarmored", def:1000, poise:25, weight:6});
-	this.prop("gear.weapon", {name:"basic_sword", atk:50, bns:5, cost:10, force:160, weight:5});
+	this.prop("gear.head", {name:"unarmored", def:100, poise:25, weight:6});
+	this.prop("gear.torso", {name:"unarmored", def:100, poise:25, weight:6});
+	this.prop("gear.arms", {name:"unarmored", def:100, poise:25, weight:6});
+	this.prop("gear.legs", {name:"unarmored", def:100, poise:25, weight:6});
+	this.prop("gear.weapon", {name:"basic_sword", atk:50, bns:5, cost:10, force:120, weight:5});
 
 	var animation_frame = {file:['shitty_wizard.png', 'shitty_wizard.png'], width:400, height:400, colliderWidth:80, colliderHeight:120, frames:1, fps:12};
 
