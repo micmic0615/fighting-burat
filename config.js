@@ -69,9 +69,9 @@ var COMBAT = {
 	cast_channel_duration: 30,
 	cast_repel_factor: 2,
 
-	knockback_damage_factor: 0.75,
+	knockback_damage_factor: 0.4,
 
-	fracture_regain: 0.05,
+	fracture_regain: 0.01,
 	fracture_amp_max: 1,
 
 	unit_movespeed: 2.5,

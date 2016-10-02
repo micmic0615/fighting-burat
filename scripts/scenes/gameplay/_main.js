@@ -15,6 +15,7 @@ define(function () {return function(SCENE){
 		bonuses_available: [],
 		buffs_current: [],
 		buffs_decked: [],
+		buffs_queued: [],
 		buffs_used: 0,
 		super: "",
 		mana_max: 100,
@@ -85,16 +86,25 @@ define(function () {return function(SCENE){
 
 	SCENE["__proto__"].buffMyFighter = function(buff, alias){
 		if (buff != "_empty"){
-			if (SCENE.player.mana_current >= BUFFS[buff].cost) {
-				SCENE.player.buffs_used += 1;
-				SCENE.player.mana_current -= BUFFS[buff].cost
-				var buff_to_use = JSON.parse(JSON.stringify(BUFFS[buff]));
-				buff_to_use.alias = buff;
-				buff_to_use.max_duration = buff_to_use.duration;
+			var not_queued = true;
+			for (var i = 0; i < SCENE.player.buffs_queued.length; ++i) {
+				if (SCENE.player.buffs_queued[i] == alias.split("_")[1]){not_queued = false; break}
+			}
 
-				SCENE.getUnit(GLOBALS.my_fighter).queuebuffs.push(buff_to_use);
+			if (not_queued){
+				if (SCENE.player.mana_current >= BUFFS[buff].cost) {
+					SCENE.player.buffs_used += 1;
+					SCENE.player.mana_current -= BUFFS[buff].cost
+					var buff_to_use = JSON.parse(JSON.stringify(BUFFS[buff]));
+					buff_to_use.alias = buff;
+					buff_to_use.max_duration = buff_to_use.duration;
 
-				SCENE.buffShuffle(alias.split("_")[1]);
+					SCENE.getUnit(GLOBALS.my_fighter).queuebuffs.push(buff_to_use);
+
+					// SCENE.buffShuffle(alias.split("_")[1]);
+
+					SCENE.player.buffs_queued.push(alias.split("_")[1])
+				};
 			};
 		};
 	};

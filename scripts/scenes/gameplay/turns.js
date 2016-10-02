@@ -3,7 +3,6 @@ define(function () { return function(){
 		"hero": initializeStats.bind(this)("hero", this.world.width/2 - 45),
 		"enemy": initializeStats.bind(this)("enemy", this.world.width/2 + 45),
 	};
-
 	
 	SOCKET.on("res.game_end", function(res){
 		SOCKET.emit("req.game_disconnect", GLOBALS.game_id);
@@ -19,6 +18,11 @@ define(function () { return function(){
 		this.getUnit(res.unit_alias).prebuffs = res.buffs
 		this.turn.index = res.turn_index;
 		RAN.set_seed(res.seed_index);
+
+		if (res.unit_alias == GLOBALS.my_fighter){
+			for (var i = 0; i < this.player.buffs_queued.length; ++i) {this.buffShuffle(this.player.buffs_queued[i])};
+			this.player.buffs_queued = [];
+		}
 	}.bind(this));
 
 	var game_over = false;
@@ -53,6 +57,8 @@ define(function () { return function(){
 
 	function applyBuffs(unit){
 		var next_turn = this.turn.sequence[this.turn.index + 1];
+
+		console.log(unit.alias)
 
 		if (unit.prebuffs.length > 0){
 			if (next_turn.unit_stats[unit.alias].buffs.length < 10){

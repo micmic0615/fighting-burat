@@ -1,6 +1,6 @@
 define(function () {return function(SCENE){
 	SCENE.newLayer({zIndex:0, alias:'background', bgColor:'#000'});
-	
+	SCENE.waiting = true;
 	
 	var init_socket = function(){MMG.loadScene("menu")};
 	
@@ -12,15 +12,6 @@ define(function () {return function(SCENE){
 		init_socket();
 	});
 
-	function ioRegister(text){
-		if (USER != null){
-			USER.name = text;
-			SOCKET.emit('req.user_login', USER);
-		} else {
-			SOCKET.emit('req.user_login', { name: text});
-		}
-	}
-	
 	var prep = 10;
 	var text_input = null;
 	SCENE.always(function(){
@@ -65,7 +56,7 @@ define(function () {return function(SCENE){
 				textAlign: "center"
 			});
 
-			SCENE.drawObj("rect", {
+			SCENE.login_btn = SCENE.drawObj("rect", {
 				x: SCENE.world.width/2 - 200,
 				y: 135,
 				fontSize: 18,
@@ -99,21 +90,36 @@ define(function () {return function(SCENE){
 
 
 	function goToMenu(){
-		var random_shit = [
-			"boring_user",
-			"i_have_no_lyf",
-			"weabo_man",
-			"fucking_johnny",
-			"loser_shit",
-			"kathniel_4ever",
-			"i_suck_dick"
-		]
+		if (SCENE.waiting){
+			SCENE.waiting = true;
 
-		var random_name = Math.floor(Math.random()*random_shit.length);
-		if (random_name > random_shit.length - 1){random_name = random_shit.length - 1}
+			var random_shit = [
+				"boring_user",
+				"i_have_no_lyf",
+				"weabo_man",
+				"fucking_johnny",
+				"loser_shit",
+				"kathniel_4ever",
+				"i_suck_dick"
+			]
 
-		if (KEYS.text == ""){KEYS.text = random_shit[random_name]};
-		ioRegister(KEYS.text);
+			var random_name = Math.floor(Math.random()*random_shit.length);
+			if (random_name > random_shit.length - 1){random_name = random_shit.length - 1}
+
+			if (KEYS.text == ""){KEYS.text = random_shit[random_name]};
+
+			SCENE.login_btn.text = "logging in as " + KEYS.text;
+			SCENE.login_btn.backgroundColor = "#66f";
+
+			if (USER != null){
+				USER.name = KEYS.text;
+				SOCKET.emit('req.user_login', USER);
+			} else {
+				SOCKET.emit('req.user_login', { name: KEYS.text});
+			}
+
+			
+		}
 	}
 
 	function keyboardInit(text_input){

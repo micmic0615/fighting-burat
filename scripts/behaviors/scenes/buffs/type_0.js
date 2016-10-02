@@ -3,7 +3,7 @@ BUFFS.agility = {
 		name: "speed_up",
 		factor: 2,
 	}],
-	duration: 15,
+	duration: 10,
 	cost: 25,
 	slot: 0,
 	type: "spell",
@@ -21,17 +21,17 @@ BUFFS.agility = {
 
 BUFFS.bleed = {
 	effects:[{
-		name: "normal_dmg_add",
+		name: "health_dmg_add",
 		factor: 100,
 	},{
-		name: "normal_dmg_multiply",
-		factor: 1.5,
+		name: "health_dmg_multiply",
+		factor: 2,
 	},{
 		name: "lifesteal_add",
-		factor: -100,
+		factor: -150,
 	}],
 	duration: 0,
-	cost: 25,
+	cost: 50,
 	slot: 0,
 	type: "attack",
 	title: "BLEED ATTACK",
@@ -57,10 +57,10 @@ BUFFS.bleed = {
 BUFFS.armorbreak = {
 	effects:[{
 		name: "defense_dmg_add",
-		factor: 160,
+		factor: 180,
 	}],
-	duration: 15,
-	cost: 15,
+	duration: 12,
+	cost: 20,
 	slot: 0,
 	type: "spell",
 	title: "ARMOR BREAK",
@@ -78,9 +78,9 @@ BUFFS.armorbreak = {
 BUFFS.damage = {
 	effects:[{
 		name: "normal_dmg_add",
-		factor: 80,
+		factor: 90,
 	}],
-	duration: 5,
+	duration: 12,
 	cost: 20,
 	slot: 0,
 	type: "spell",
@@ -99,13 +99,13 @@ BUFFS.damage = {
 BUFFS.acid = {
 	effects:[{
 		name: "defense_heal_add",
-		factor: -40,
+		factor: -60,
 	},{
 		name: "defense_dmg_add",
-		factor: 60,
+		factor: 90,
 	},{
 		name: "defense_dmg_reflect_add",
-		factor: 60,
+		factor: 90,
 	}],
 	duration: 6,
 	cost: 25,

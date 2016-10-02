@@ -6,8 +6,8 @@ BUFFS.defense = {
 		name: "reduce_dmg_subtract",
 		factor: 10,
 	}],
-	duration: 15,
-	cost: 15,
+	duration: 12,
+	cost: 20,
 	slot: 1,
 	type: "spell",
 	title: "DEFENSE UP",
@@ -25,10 +25,10 @@ BUFFS.defense = {
 BUFFS.thorns = {
 	effects:[{
 		name: "health_dmg_reflect_add",
-		factor: 50,
+		factor: 120,
 	}],
-	duration: 2,
-	cost: 20,
+	duration: 6,
+	cost: 22,
 	slot: 1,
 	type: "spell",
 	title: "THORNS",
@@ -45,15 +45,24 @@ BUFFS.thorns = {
 
 BUFFS.deflect = {
 	effects:[{
+		name: "stamina_dmg_add",
+		factor: -35,
+	},{
 		name: "defense_dmg_reflect_add",
-		factor: 80,
+		factor: 180,
+	},{
+		name: "speed_up",
+		factor: 0.5,
+	},{
+		name: "health_dmg_reflect_add",
+		factor: 120,
 	}],
-	duration: 10,
-	cost: 12,
+	duration: 5,
+	cost: 50,
 	slot: 1,
-	type: "spell",
+	type: "attack",
 	title: "DEFLECT",
-	tooltip: "being attacked causes enemy to lose armor",
+	tooltip: "slow yourself and attacks will increase enemy bravey for good damage reflect.",
 	sfx: [{
 		sprite: "deflect",
 		frames: 3,
@@ -67,26 +76,32 @@ BUFFS.deflect = {
 BUFFS.curse = {
 	effects:[{
 		name: "health_dmg_reflect_add",
-		factor: 25,
+		factor: 40,
+	},{
+		name: "defense_dmg_reflect_add",
+		factor: 60,
 	},{
 		name: "reduce_dmg_divide",
 		factor: 2.5,
 	},{
 		name: "reduce_dmg_subtract",
-		factor: 10,
+		factor: 25,
 	},{
 		name: "health_heal_add",
-		factor: -20,
+		factor: -30,
 	},{
 		name: "normal_dmg_multiply",
-		factor: 0.65,
+		factor: 0.25,
+	},{
+		name: "defense_dmg_add",
+		factor: 120,
 	}],
 	duration: 6,
-	cost: 25,
+	cost: 50,
 	slot: 1,
 	type: "defend",
 	title: "CURSE",
-	tooltip: "reduce your attack and degenerate health for greatly increased defense and damage return",
+	tooltip: "reduce your attack and degenerate health for greatly increased defense and damage return and armorbreak",
 	sfx: [{
 		sprite: "curse",
 		frames: 2,

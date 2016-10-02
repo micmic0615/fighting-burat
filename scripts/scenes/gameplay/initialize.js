@@ -10,15 +10,12 @@ define(function () {return function(){
 	this.newLayer({zIndex:1, alias:'main'});
 	this.newLayer({zIndex:2, alias:'ui'});
 
-
 	var floor = this.newUnit("background", "floor", {
 		alias:'myFloor',
 		locX:this.getScreen().width/2,
 		locY:this.getScreen().height - 100,
 		scaleY: 2
 	})
-
-
 
 	this.newUnit("main", GLOBALS.match_players[0].stats._actortype, {
 		alias:'hero',
@@ -60,17 +57,24 @@ define(function () {return function(){
 				alias:"buffs_" + i, clickable: true, freeSize: true, anchored: true,
 				locX: 10 + ( i * ( 95 ) ),
 				locY: this.getScreen().height - 120,
-				width:90,
-				height:90,
-				opacity:1,
+				width: 90,
+				height: 90,
+				opacity: 1,
+			});
+
+			icons["buffs_queue_marker_" + i] =  this.drawObj("rect",{
+				backgroundColor: "#ff0", 
+				x: 10 + ( i * ( 95 ) ),
+				y: this.getScreen().height - 120,
+				width: 90,
+				height: 90,
+				opacity: 0.5,
 			});
 
 			icons["buffs_" + i].clicked = clickIcon.bind(this, "buffs_" + i);
 
 			texts["buffs_" + i] = this.drawObj("floatingText",{text:"", color: "#f0f", fontSize: 16, x: 15 + ( i * ( 95 ) ), y: this.getScreen().height - 105});
 		}
-
-		
 
 		for (var i = 0; i < COMBAT.buffs_foresight; ++i) {
 			icons["nextbuffs_" + i] = this.newUnit("ui", "buff_icons", {
@@ -190,27 +194,41 @@ define(function () {return function(){
 		if (turn.phase <= 0 || turn.phase <= 2){
 			for (var i = 0; i < COMBAT.buffs_max; ++i) {
 				if (player.buffs_current.length > 0){var p = player.buffs_current[i]} else {var p = "_empty"};
+
+				var buff_ready = true;
+
+				for (var i2 = 0; i2 < player.buffs_queued.length; ++i2) {
+					var p2 = player.buffs_queued[i2];
+					if (i == p2){buff_ready = false; break};
+				}
 				
 				icons["buffs_" + i].setAnimation(p);
 
-				if (p != "_empty"){
-					var ref_buff = BUFFS[p]
+				if (buff_ready){					
+					if (p != "_empty" ){
+						var ref_buff = BUFFS[p];
 
-					texts["buffs_" + i].text = ref_buff.cost
+						texts["buffs_" + i].text = ref_buff.cost
 
-					if (ref_buff.cost > player.mana_current) {
-						icons["buffs_" + i].opacity = 0.35;
-						texts["buffs_" + i].opacity = 1;
-						texts["buffs_" + i].color = "#60c";
+						if (ref_buff.cost > player.mana_current) {
+							icons["buffs_queue_marker_" + i].backgroundColor = "#60c";
+							icons["buffs_queue_marker_" + i].y = icons["buffs_" + i].locY
+							texts["buffs_" + i].opacity = 1;
+							texts["buffs_" + i].color = "#fff";
+						} else {
+							icons["buffs_queue_marker_" + i].y = -200;
+							texts["buffs_" + i].opacity = 1;
+							texts["buffs_" + i].color = "#f0f";
+						}
 					} else {
-						icons["buffs_" + i].opacity = 1;
-						texts["buffs_" + i].opacity = 1;
-						texts["buffs_" + i].color = "#f0f";
+						texts["buffs_" + i].text = "";
 					}
 				} else {
-					texts["buffs_" + i].text = "";
-					icons["buffs_" + i].opacity = 1;
+					icons["buffs_queue_marker_" + i].backgroundColor = "#ff0";
+					icons["buffs_queue_marker_" + i].y = icons["buffs_" + i].locY;
+					texts["buffs_" + i].color = "#f00";
 				}
+				
 			}
 
 			for (var i = 0; i < COMBAT.buffs_foresight; ++i) {

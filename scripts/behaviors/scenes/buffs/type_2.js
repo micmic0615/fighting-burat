@@ -1,17 +1,20 @@
 BUFFS.force = {
 	effects:[{
 		name: "force_add",
-		factor: 200,
-	}, {
+		factor: 240,
+	},{
 		name: "stamina_dmg_add",
 		factor: 8,
+	},{
+		name: "stun_add",
+		factor: 1,
 	}],
-	duration: 15,
-	cost: 20,
+	duration: 8,
+	cost: 30,
 	slot: 2,
 	type: "spell",
 	title: "FORCE PUSH",
-	tooltip: "increases knockback and adds minor fear attack",
+	tooltip: "increases knockback and adds minor fear attack and minor bash",
 	sfx: [{
 		sprite: "stupid",
 		frames: 2,
@@ -24,13 +27,16 @@ BUFFS.force = {
 
 BUFFS.focusbreak = {
 	effects:[{
+		name: "stamina_heal_add",
+		factor: 2,
+	},{
 		name: "stamina_dmg_add",
-		factor: 15,
+		factor: 20,
 	}],
-	duration: 12,
-	cost: 16,
+	duration: 8,
+	cost: 20,
 	slot: 2,
-	type: "spell",
+	type: "attack",
 	title: "FEAR ATTACK",
 	tooltip: "attacks reduces enemy bravery",
 	sfx: [{
@@ -45,11 +51,20 @@ BUFFS.focusbreak = {
 
 BUFFS.bash = {
 	effects:[{
+		name: "health_dmg_add",
+		factor: 120,
+	},{
 		name: "stun_add",
-		factor: 4,
+		factor: 8,
+	},{
+		name: "force_add",
+		factor: 120,
+	},{
+		name: "stamina_dmg_add",
+		factor: 10,
 	}],
 	duration: 0,
-	cost: 16,
+	cost: 40,
 	slot: 2,
 	type: "attack",
 	title: "BASH",
@@ -67,13 +82,13 @@ BUFFS.bash = {
 BUFFS.transmute = {
 	effects:[{
 		name: "health_heal_add",
-		factor: -30,
+		factor: -40,
 	},{
 		name: "defense_heal_add",
-		factor: 60,
+		factor: 80,
 	}],
 	duration: 10,
-	cost: 18,
+	cost: 22,
 	slot: 1,
 	type: "spell",
 	title: "TRANSMUTE",
@@ -91,16 +106,19 @@ BUFFS.transmute = {
 BUFFS.poison = {
 	effects:[{
 		name: "health_heal_add",
-		factor: -15,
+		factor: -35,
 	},{
 		name: "normal_dmg_add",
-		factor: 60,
+		factor: 80,
+	},{
+		name: "stamina_dmg_add",
+		factor: 8,
 	},{
 		name: "health_dmg_reflect_add",
 		factor: 120,
 	}],
-	duration: 6,
-	cost: 25,
+	duration: 5,
+	cost: 35,
 	slot: 2,
 	type: "attack",
 	title: "POISON (YOURSELF, LEZ)",
@@ -117,15 +135,21 @@ BUFFS.poison = {
 
 BUFFS.focus = {
 	effects:[{
+		name: "speed_up",
+		factor: 1.5,
+	},{
 		name: "stamina_heal_add",
-		factor: 3,
+		factor: 8,
+	},{
+		name: "health_heal_add",
+		factor: 25,
 	}],
-	duration: 20,
-	cost: 15,
+	duration: 5,
+	cost: 25,
 	slot: 2,
-	type: "spell",
-	title: "BRAVERY UP",
-	tooltip: "continuously increases bravery",
+	type: "defend",
+	title: "FERVOR",
+	tooltip: "continuously increases bravery and regenerate HP as long as attacking",
 	sfx: [{
 		sprite: "stupid",
 		frames: 2,

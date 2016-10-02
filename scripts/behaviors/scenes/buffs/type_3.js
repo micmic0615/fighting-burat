@@ -1,10 +1,10 @@
 BUFFS.heal = {
 	effects:[{
 		name: "health_heal_add",
-		factor: 280,
+		factor: 400,
 	}],
 	duration: 0,
-	cost: 24,
+	cost: 30,
 	slot: 3,
 	type: "spell",
 	title: "JESUS",
@@ -22,10 +22,10 @@ BUFFS.heal = {
 BUFFS.regen = {
 	effects:[{
 		name: "health_heal_add",
-		factor: 18,
+		factor: 25,
 	}],
-	duration: 18,
-	cost: 20,
+	duration: 20,
+	cost: 25,
 	slot: 3,
 	type: "spell",
 	title: "MARY",
@@ -83,12 +83,12 @@ BUFFS.peacemaker = {
 		name: "reduce_dmg_divide",
 		factor: 1.5,
 	}],
-	duration: 6,
-	cost: 45,
+	duration: 3,
+	cost: 35,
 	slot: 3,
 	type: "defend",
 	title: "PEACEMAKER",
-	tooltip: "Give up a good chunk of your damage for greater regeneration daamage reductton and fear attacks",
+	tooltip: "Give up a good chunk of your damage for greater regeneration damage reduction and fear attacks",
 	sfx: [{
 		sprite: "stupid",
 		frames: 2,

@@ -2,8 +2,8 @@ define(function () {var THIS_UNIT = function(){
 	this.prop("group", "actors");	
 
 	this.prop("primary.vig", 15);
-	this.prop("primary.end", 6);
-	this.prop("primary.str", 18);
+	this.prop("primary.end", 10);
+	this.prop("primary.str", 20);
 	this.prop("primary.vit", 10);
 	
 	this.prop("gear.head", {name:"unarmored", def:500, poise:25, weight:4});

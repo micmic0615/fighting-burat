@@ -175,7 +175,7 @@ define(function () {return function(SCENE){
 					char_desc.text = "Skills are defense and healing based. Relies on destroying enemy armor first.";
 					char_buffs = [
 						"defense",
-						"thorns",
+						"curse",
 						"regen",
 						"heal",
 						"armorbreak",
@@ -197,8 +197,8 @@ define(function () {return function(SCENE){
 						"thorns",
 						"lifesteal",
 						"bleed",
-						"focus",
-						"regen"
+						"poison",
+						"focus"
 					]
 					break;
 				case "trickster": 
@@ -214,7 +214,7 @@ define(function () {return function(SCENE){
 						"focusbreak",
 						"force",
 						"regen",
-						"poison",
+						"deflect",
 						"peacemaker"
 					]
 					break;
