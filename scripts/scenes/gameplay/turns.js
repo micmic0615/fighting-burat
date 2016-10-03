@@ -57,9 +57,6 @@ define(function () { return function(){
 
 	function applyBuffs(unit){
 		var next_turn = this.turn.sequence[this.turn.index + 1];
-
-		console.log(unit.alias)
-
 		if (unit.prebuffs.length > 0){
 			if (next_turn.unit_stats[unit.alias].buffs.length < 10){
 				
@@ -78,7 +75,7 @@ define(function () { return function(){
 
 				for (var i2 = 0; i2 < p.effects.length; ++i2) {
 					var p2 = p.effects[i2];
-					if (p2.name == "speed_up" && (p.used == undefined || p.used == false)) {
+					if (p2.name == "compound.speed" && (p.used == undefined || p.used == false)) {
 						p.used = true;
 						recalc_turns = true
 						if (p.duration > recalc_duration){recalc_duration = p.duration}
@@ -173,7 +170,7 @@ define(function () { return function(){
 					var p2 = current.unit_stats[p].buffs[i2];
 					for (var i3 = 0; i3 < p2.effects.length; ++i3) {
 						var p3 = p2.effects[i3];
-						if (p3.name == "speed_up") {if (p2.duration >= this.turn.sequence_max) {unit._agi.factor += p3.factor} else {unit._agi.factor += p3.factor * (p2.duration / this.turn.sequence_max)}}
+						if (p3.name == "compound.speed") {if (p2.duration >= this.turn.sequence_max) {unit._agi.factor += p3.factor} else {unit._agi.factor += p3.factor * (p2.duration / this.turn.sequence_max)}}
 					}
 				}
 			}
@@ -291,63 +288,42 @@ define(function () { return function(){
 					} else { next_unit.staminaregen.splice(i, 1); i-- }
 				};
 
-				buff_effects[b] = {
-					normal_dmg_add: 0,
-					health_dmg_add: 0,
-					defense_dmg_add: 0,
-					health_dmg_reflect_add: 0,
-					reduce_dmg_divide: 1,
-					defense_dmg_reflect_add: 0,
-					blocks_add: 0,
-					defense_heal_add: 0,
-					force_add: 0,
-					stamina_dmg_add: 0,
-					stun_add: 0,
-					stamina_heal_add: 0,
-					health_heal_add: 0,
-					lifesteal_add: 0,
-
-					normal_dmg_multiply: 1,
-					health_dmg_multiply: 1,
-					defense_dmg_multiply: 1,
-					stamina_dmg_multiply: 1,
-					force_multiply: 1,
-					reduce_dmg_subtract: 0,
-				};
+				buff_effects[b] = this.buff_effects.clone();				
 
 				for (var i = 0; i < current.unit_stats[b].buffs.length; ++i) {
 					var p = current.unit_stats[b].buffs[i];
 					for (var i2 = 0; i2 < p.effects.length; ++i2) {
 						var p2 = p.effects[i2];
-						var effects_check = p2.name.split("_")
-						switch (effects_check[effects_check.length - 1]) {
-							case "add": buff_effects[b][p2.name] += p2.factor; break;
-							case "subtract": buff_effects[b][p2.name] -= p2.factor; break;
-							case "multiply": if (p2.factor > 0){buff_effects[b][p2.name] *= p2.factor}; break;
-							case "divide": if (p2.factor > 0){buff_effects[b][p2.name] /= p2.factor}; break;
-						};
-					};					
+						var effects_check = p2.name.split(".");
+						switch (effects_check[0]) {
+							case "simple": buff_effects[b][p2.name] += p2.factor; break
+							case "compound": buff_effects[b][p2.name] *= p2.factor; break
+						};		
+					};
 				};
 
-				if (buff_effects[b]["health_heal_add"] != 0) {
-					if (next_unit.health + buff_effects[b]["health_heal_add"] >= this.fighters[b].health_max) {next_unit.health = this.fighters[b].health_max}
-					else {next_unit.health += buff_effects[b]["health_heal_add"]};
+				if (buff_effects[b]["simple.heal_health"] != 0) {
+					if (next_unit.health + buff_effects[b]["simple.heal_health"] >= this.fighters[b].health_max) {next_unit.health = this.fighters[b].health_max}
+					else {next_unit.health += buff_effects[b]["simple.heal_health"]};
 				};
 
-				if (buff_effects[b]["stamina_heal_add"] != 0) {
-					if (next_unit.stamina + buff_effects[b]["stamina_heal_add"] >= this.fighters[b].stamina_max) {next_unit.stamina = this.fighters[b].stamina_max}
-					else {next_unit.stamina += buff_effects[b]["stamina_heal_add"]};
+				if (buff_effects[b]["simple.heal_defense"] != 0) {
+					if (next_unit.defense + buff_effects[b]["simple.heal_defense"] >= this.fighters[b].defense_max) {next_unit.defense = this.fighters[b].defense_max}
+					else {next_unit.defense += buff_effects[b]["simple.heal_defense"]};
 				};
 
-				if (buff_effects[b]["blocks_add"] != 0) {
-					if (next_unit.block + buff_effects[b]["blocks_add"] >= COMBAT.blocks_max) {next_unit.block = COMBAT.blocks_max} 
-					else {next_unit.block += buff_effects[b]["blocks_add"]};
+				if (buff_effects[b]["simple.heal_stamina"] != 0) {
+					if (next_unit.stamina + buff_effects[b]["simple.heal_stamina"] >= this.fighters[b].stamina_max) {next_unit.stamina = this.fighters[b].stamina_max}
+					else {next_unit.stamina += buff_effects[b]["simple.heal_stamina"]};
 				};
 
-				if (buff_effects[b]["defense_heal_add"] != 0) {
-					if (next_unit.defense + buff_effects[b]["defense_heal_add"] >= this.fighters[b].defense_max) {next_unit.defense = this.fighters[b].defense_max}
-					else {next_unit.defense += buff_effects[b]["defense_heal_add"]};
+				if (buff_effects[b]["simple.heal_block"] != 0) {
+					if (next_unit.block + buff_effects[b]["simple.heal_block"] >= COMBAT.blocks_max) {next_unit.block = COMBAT.blocks_max} 
+					else {next_unit.block += buff_effects[b]["simple.heal_block"]};
 				};
+
+				var fracture_regain = this.fighters[b].defense_max*COMBAT.fracture_regain;
+				if (next_unit.fracture + fracture_regain < this.fighters[b].defense_max){next_unit.fracture += fracture_regain} else {next_unit.fracture = this.fighters[b].defense_max};
 
 				next.unit_stats[b] = next_unit;
 			};
@@ -362,14 +338,14 @@ define(function () { return function(){
 
 					if (attack_proc <= attack_chance) { var action = "attack" } else { var action = "cast" };
 				} else {
-					var action = "cast"
+					var action = "cast";
 				}	
 			} else {
-				var action = "skip"
+				var action = "skip";
 			};		
 
 			current.action = action;
-			current.force = this.fighters[origin].force + buff_effects[origin].force_add;
+			current.force = this.fighters[origin].force + buff_effects[origin]["simple.force"];
 			current.poise = this.fighters[target].poise;
 
 			current.evaluated = true;	
@@ -395,16 +371,25 @@ define(function () { return function(){
 				var origin = this.getUnit(current.origin);
 				var target = this.getUnit(current.target);
 
-			
+
+				
 				switch(this.turn.phase){
 					case -1:
 						if (Math.abs(origin.locX - target.locX) < COMBAT.attack_distance){changeTurnPhase.bind(this)()} else {origin.walkForward(); target.walkForward()};
 						break
-					case 0: 
-								
+					case 0: 							
 						origin.setStats(current.unit_stats[current.origin]);
 						target.setStats(current.unit_stats[current.target]);
-				
+						origin.animation.speed = 1;
+						target.animation.speed = 1;
+						
+						for (var i = 0; i < origin.buffs.length; ++i) {
+							var p = origin.buffs[i];
+							for (var i2 = 0; i2 < p.effects.length; ++i2) {
+								var p2 = p.effects[i2];
+								if (p2.name == "compound.speed") {origin.animation.speed /= p2.factor}
+							}
+						}
 						
 						changeTurnPhase.bind(this)();
 						break;

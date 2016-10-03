@@ -1,12 +1,12 @@
 BUFFS.force = {
 	effects:[{
-		name: "force_add",
+		name: "simple.force",
 		factor: 240,
 	},{
-		name: "stamina_dmg_add",
+		name: "simple.attack_stamina",
 		factor: 8,
 	},{
-		name: "stun_add",
+		name: "debuff.stun",
 		factor: 1,
 	}],
 	duration: 8,
@@ -27,10 +27,10 @@ BUFFS.force = {
 
 BUFFS.focusbreak = {
 	effects:[{
-		name: "stamina_heal_add",
+		name: "simple.heal_stamina",
 		factor: 2,
 	},{
-		name: "stamina_dmg_add",
+		name: "simple.attack_stamina",
 		factor: 20,
 	}],
 	duration: 8,
@@ -51,16 +51,16 @@ BUFFS.focusbreak = {
 
 BUFFS.bash = {
 	effects:[{
-		name: "health_dmg_add",
+		name: "simple.attack_normal",
 		factor: 120,
 	},{
-		name: "stun_add",
+		name: "simple.stun",
 		factor: 8,
 	},{
-		name: "force_add",
+		name: "simple.force",
 		factor: 120,
 	},{
-		name: "stamina_dmg_add",
+		name: "simple.attack_stamina",
 		factor: 10,
 	}],
 	duration: 0,
@@ -81,10 +81,10 @@ BUFFS.bash = {
 
 BUFFS.transmute = {
 	effects:[{
-		name: "health_heal_add",
+		name: "simple.heal_health",
 		factor: -40,
 	},{
-		name: "defense_heal_add",
+		name: "simple.heal_defense",
 		factor: 80,
 	}],
 	duration: 10,
@@ -105,16 +105,16 @@ BUFFS.transmute = {
 
 BUFFS.poison = {
 	effects:[{
-		name: "health_heal_add",
+		name: "simple.heal_health",
 		factor: -35,
 	},{
-		name: "normal_dmg_add",
+		name: "simple.attack_normal",
 		factor: 80,
 	},{
-		name: "stamina_dmg_add",
+		name: "simple.attack_stamina",
 		factor: 8,
 	},{
-		name: "health_dmg_reflect_add",
+		name: "simple.return_health",
 		factor: 120,
 	}],
 	duration: 5,
@@ -135,13 +135,13 @@ BUFFS.poison = {
 
 BUFFS.focus = {
 	effects:[{
-		name: "speed_up",
+		name: "compound.speed",
 		factor: 1.5,
 	},{
-		name: "stamina_heal_add",
+		name: "simple.heal_stamina",
 		factor: 8,
 	},{
-		name: "health_heal_add",
+		name: "simple.heal_health",
 		factor: 25,
 	}],
 	duration: 5,

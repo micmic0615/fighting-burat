@@ -1,9 +1,9 @@
 BUFFS.defense = {
 	effects:[{
-		name: "reduce_dmg_divide",
+		name: "compound.guard_normal",
 		factor: 2,
 	},{
-		name: "reduce_dmg_subtract",
+		name: "simple.guard_normal",
 		factor: 10,
 	}],
 	duration: 12,
@@ -24,7 +24,7 @@ BUFFS.defense = {
 
 BUFFS.thorns = {
 	effects:[{
-		name: "health_dmg_reflect_add",
+		name: "simple.return_health",
 		factor: 120,
 	}],
 	duration: 6,
@@ -45,16 +45,16 @@ BUFFS.thorns = {
 
 BUFFS.deflect = {
 	effects:[{
-		name: "stamina_dmg_add",
+		name: "simple.attack_stamina",
 		factor: -35,
 	},{
-		name: "defense_dmg_reflect_add",
+		name: "simple.return_defense",
 		factor: 180,
 	},{
-		name: "speed_up",
+		name: "compound.speed",
 		factor: 0.5,
 	},{
-		name: "health_dmg_reflect_add",
+		name: "simple.return_health",
 		factor: 120,
 	}],
 	duration: 5,
@@ -75,26 +75,26 @@ BUFFS.deflect = {
 
 BUFFS.curse = {
 	effects:[{
-		name: "health_dmg_reflect_add",
+		name: "simple.return_health",
 		factor: 40,
 	},{
-		name: "defense_dmg_reflect_add",
+		name: "simple.return_defense",
 		factor: 60,
 	},{
-		name: "reduce_dmg_divide",
-		factor: 2.5,
-	},{
-		name: "reduce_dmg_subtract",
+		name: "simple.guard_normal",
 		factor: 25,
 	},{
-		name: "health_heal_add",
+		name: "simple.heal_health",
 		factor: -30,
 	},{
-		name: "normal_dmg_multiply",
+		name: "simple.attack_defense",
+		factor: 120,
+	},{
+		name: "compound.attack_normal",
 		factor: 0.25,
 	},{
-		name: "defense_dmg_add",
-		factor: 120,
+		name: "compound.guard_normal",
+		factor: 2.5,
 	}],
 	duration: 6,
 	cost: 50,
@@ -114,10 +114,10 @@ BUFFS.curse = {
 
 BUFFS.vanguard = {
 	effects:[{
-		name: "blocks_add",
+		name: "simple.heal_block",
 		factor: 5,
 	}],
-	duration: 1,
+	duration: 0,
 	cost: 8,
 	slot: 1,
 	type: "spell",

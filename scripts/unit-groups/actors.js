@@ -109,7 +109,7 @@ THIS_UNIT.prototype.setStats = function(stats){
 			
 			var randomizer = Math.random()*30;
 			switch (p2.name){
-				case "health_heal_add":
+				case "simple.heal_health":
 					if (p2.factor + this.current.health >= this.derived.health){
 						var total_heal = this.derived.health - this.current.health
 					} else {
@@ -133,7 +133,7 @@ THIS_UNIT.prototype.setStats = function(stats){
 					
 					break;
 				
-				case "stamina_heal_add":
+				case "simple.heal_stamina":
 					if (p2.factor + this.current.stamina >= this.derived.stamina){
 						var total_heal = this.derived.stamina - this.current.stamina
 					} else {
@@ -153,7 +153,7 @@ THIS_UNIT.prototype.setStats = function(stats){
 					MMG.stage.drawObj("flyingText", {text: texter, color: "#f60", fontSize: fontSize, life: 100, x: this.locX, y: this.locY - 10,  angle: 255 + randomizer});
 					break;
 
-				case "defense_heal_add":
+				case "simple.heal_defense":
 					if (p2.factor + this.current.defense >= this.derived.defense){
 						var total_heal = this.derived.defense - this.current.defense
 					} else {

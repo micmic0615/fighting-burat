@@ -1,154 +1,154 @@
 define(function () {return function(){
-	this["__proto__"].actionAttack = function(index, buff_effects){
+	this["__proto__"].actionAttack = function(index, bfx){
 		var current = this.turn.sequence[index];
 		var next = this.turn.sequence[index + 1];
 
 		var origin = current.origin;
 		var target = current.target;
+		var cu_stats = current.unit_stats;
+		var nu_stats = next.unit_stats;
 
-		var damage_total = (this.fighters[origin].damage + buff_effects[origin].normal_dmg_add + buff_effects[target].reduce_dmg_subtract ) * buff_effects[origin].normal_dmg_multiply * buff_effects[target].reduce_dmg_divide;
+		var attack_health_factor = 0.5;
+		var attack_defense_factor = 0.5;
+		var push_resist = 1;
+		var defense_break_amp = 1.25
 
-		if (current.unit_stats[target].block > 0) {
-			var damage_health_factor = 0;
-			var damage_defense_factor = 1;
-			var push_resist = 2;
-			var defense_spill_factor = 1.25
-			next.unit_stats[target].block--;
-		} else {
-			var damage_health_factor = 0.5;
-			var damage_defense_factor = 0.5;
-			var push_resist = 1;
-			var defense_spill_factor = 1.25
+		if (cu_stats[target].block > 0) {
+			attack_health_factor = 0;
+			attack_defense_factor = 1;
+			push_resist = 2;
+			defense_break_amp = 1
+			nu_stats[target].block--;
 		}
 
-		if (Math.round(damage_total * damage_defense_factor) >= current.unit_stats[target].defense) {
-			current.damage.target.defense = current.unit_stats[target].defense;
-			var damage_defense_spill = Math.round(damage_total * damage_defense_factor) - current.damage.target.defense;
-		} else {
-			current.damage.target.defense = Math.round(damage_total * damage_defense_factor);
-			var damage_defense_spill = 0;
-		}
+		var attack_normal = (this.fighters[origin].damage + bfx[origin]["simple.attack_normal"] - bfx[target]["simple.guard_normal"] ) * (bfx[origin]["compound.attack_normal"] / bfx[target]["compound.guard_normal"]);
+		var stat_keys = ["stamina", "health", "defense", "fracture"];
+		var stat_leech = ["leech_stamina", "leech_health", "leech_defense"]
 
-		current.damage.target.defense += buff_effects[origin].defense_dmg_add;		
-		
-		current.damage.target.defense *= buff_effects[origin].defense_dmg_multiply;
-		if (current.damage.target.defense >= current.unit_stats[target].defense) { 			
-			current.damage.target.fracture = current.damage.target.defense - current.unit_stats[target].defense;
-			current.damage.target.defense = current.unit_stats[target].defense;
-
-			if (current.damage.target.fracture >= current.unit_stats[target].fracture){
-				current.damage.target.fracture = current.unit_stats[target].fracture;
-			}
-		}
-
-		current.damage.target.health = Math.round((damage_total * damage_health_factor) + damage_defense_spill);
-		current.damage.target.health += buff_effects[origin].health_dmg_add;
-		current.damage.target.health *= buff_effects[origin].health_dmg_multiply;
-
-		if (current.unit_stats[target].stamina > 0) {
-			current.damage.target.stamina = (current.unit_stats[target].stamina - (current.unit_stats[target].stamina / buff_effects[origin].stamina_dmg_multiply)) + buff_effects[origin].stamina_dmg_add;
-		} else {
-			current.damage.target.stamina = buff_effects[origin].stamina_dmg_add;
-		}
-
-		if (current.unit_stats[target].stamina - current.damage.target.stamina <= 0){current.damage.target.stamina *= 0.5};
-
-		if (current.unit_stats[origin].locX > current.unit_stats[target].locX) { var push_direction = -1 } else { var push_direction = 1 };
-
-		var total_push = (Math.round(((this.fighters[origin].force + buff_effects[origin].force_add) / this.fighters[target].poise) * COMBAT.flinch_push_duration) * push_direction * COMBAT.flinch_push_movement) + (push_direction * COMBAT.flinch_push_movement * COMBAT.flinch_push_base);
-		total_push /= push_resist;
-
-		if (next.unit_stats[target].locX + total_push <= COMBAT.margin) {
-			var knockback_damage = COMBAT.margin - (next.unit_stats[target].locX + total_push);
-			next.unit_stats[target].locX = COMBAT.margin;
-		} else if (next.unit_stats[target].locX + total_push >= this.world.width - COMBAT.margin) {
-			var knockback_damage = (next.unit_stats[target].locX + total_push) - (this.world.width - COMBAT.margin);
-			next.unit_stats[target].locX = this.world.width - COMBAT.margin;
-		} else {
-			var knockback_damage = 0;
-			next.unit_stats[target].locX += total_push;
-		}
-
-		current.damage.target.health += knockback_damage * COMBAT.knockback_damage_factor;
-
-		if (damage_defense_spill > 0){current.damage.target.health *= defense_spill_factor};
-
-		if (Math.abs(current.unit_stats[origin].locX - current.unit_stats[target].locX) > COMBAT.attack_distance) {
-			current.unit_stats[origin].locX = current.unit_stats[target].locX + push_direction * -1 * COMBAT.attack_distance;
-			next.unit_stats[origin].locX = current.unit_stats[origin].locX;
-		}
-
-		
-		var fracture_amp = 1;
-
-		if (next.unit_stats[target].defense <= 0){			
-			current.damage.target.fracture = Math.round(current.damage.target.fracture);
-			next.unit_stats[target].fracture -= current.damage.target.fracture;
-			var fracture_regain = this.fighters[target].defense_max*COMBAT.fracture_regain;
-			if (next.unit_stats[target].fracture + fracture_regain < this.fighters[target].defense_max){next.unit_stats[target].fracture += fracture_regain} else {next.unit_stats[target].fracture = this.fighters[target].defense_max};
-
-			fracture_amp += (COMBAT.fracture_amp_max - COMBAT.fracture_amp_max*(next.unit_stats[target].fracture / this.fighters[target].defense_max));
-		} else {
-			current.damage.target.fracture = 0;
-			next.unit_stats[target].fracture = this.fighters[target].defense_max;
-		}	
-
-		current.damage.target.health = Math.round(current.damage.target.health * fracture_amp);
-		current.damage.target.stamina = Math.round(current.damage.target.stamina);
-		current.damage.target.defense = Math.round(current.damage.target.defense);
-
-		next.unit_stats[target].health -= current.damage.target.health;
-		next.unit_stats[target].stamina -= current.damage.target.stamina;
-		next.unit_stats[target].defense -= current.damage.target.defense;
-
-			
-		
-		current.damage.origin.health = Math.round(buff_effects[target].health_dmg_reflect_add);
-		current.damage.origin.defense = Math.round(buff_effects[target].defense_dmg_reflect_add);		
-		if (current.damage.origin.defense >= next.unit_stats[origin].defense){
-			current.damage.origin.fracture = current.damage.origin.defense - next.unit_stats[origin].defense;
-			current.damage.origin.defense = next.unit_stats[origin].defense;
+		var attack = {
+			stamina: bfx[origin]["simple.attack_stamina"],
+			health: attack_normal * attack_health_factor,
+			defense: attack_normal * attack_defense_factor,
+			defense_break: false,
+			fracture: 0,
+			leech_health: bfx[origin]["simple.leech_health"],
+			leech_defense: bfx[origin]["simple.leech_defense"],
+			leech_stamina: bfx[origin]["simple.leech_stamina"],
+			fracture_amp: 1,
+			fracture_ref: nu_stats[target].fracture
 		};
 
-		current.damage.origin.leech_health = Math.round(buff_effects[origin].lifesteal_add);
+		var reflect = {
+			stamina: bfx[target]["simple.return_stamina"],
+			health: bfx[target]["simple.return_health"],
+			defense: bfx[target]["simple.return_defense"],
+			defense_break: false,
+			fracture: 0,
+			fracture_amp: 1,
+			fracture_ref: nu_stats[origin].fracture
+		};
 
-		if (next.unit_stats[origin].health + current.damage.origin.leech_health >= this.fighters[origin].health_max){
-			next.unit_stats[origin].health = this.fighters[origin].health_max;
-		} else {
-			next.unit_stats[origin].health += current.damage.origin.leech_health;
+		if (attack.stamina >= cu_stats[target].stamina){attack.stamina = cu_stats[target].stamina};
+
+		if (attack.defense >= cu_stats[target].defense){
+			attack.health += attack.defense - cu_stats[target].defense;
+			attack.defense = cu_stats[target].defense;
 		}
 
+		attack.health = (attack.health + bfx[origin]["simple.attack_health"] - bfx[target]["simple.guard_health"]) * (bfx[origin]["compound.attack_health"] / bfx[target]["compound.guard_health"]);
+		attack.defense = (attack.defense + bfx[origin]["simple.attack_defense"] - bfx[target]["simple.guard_defense"]) * (bfx[origin]["compound.attack_defense"] / bfx[target]["compound.guard_defense"]);
+
+		if (attack.defense >= cu_stats[target].defense){
+			attack.defense_break = true;
+			attack.fracture = attack.defense - cu_stats[target].defense;
+			attack.defense = cu_stats[target].defense;
+
+			if (attack.fracture >= attack.fracture_ref){attack.fracture = attack.fracture_ref};
+			attack.fracture_ref -= attack.fracture;
+			attack.fracture_amp += (COMBAT.fracture_amp_max - COMBAT.fracture_amp_max*(attack.fracture_ref / this.fighters[target].defense_max));
+		}
+
+		var push_direction = 1
+		if (cu_stats[origin].locX > cu_stats[target].locX) {push_direction = -1};
+
+		var total_push = (Math.round(((this.fighters[origin].force + bfx[origin]["simple.force"]) / this.fighters[target].poise) * COMBAT.flinch_push_duration) * push_direction * COMBAT.flinch_push_movement) + (push_direction * COMBAT.flinch_push_movement * COMBAT.flinch_push_base);
+		total_push /= push_resist;
 		
-
-		next.unit_stats[origin].health -= current.damage.origin.health;
-		next.unit_stats[origin].defense -= current.damage.origin.defense;
-		next.unit_stats[origin].stamina -= this.fighters[origin].stamina_cost;
-
-		if (next.unit_stats[origin].defense <= 0){
-			next.unit_stats[origin].fracture -= current.damage.origin.fracture;
-			var fracture_regain = this.fighters[origin].defense_max*COMBAT.fracture_regain;
-			if (next.unit_stats[origin].fracture + fracture_regain < this.fighters[origin].defense_max){next.unit_stats[origin].fracture += fracture_regain} else {next.unit_stats[origin].fracture = this.fighters[origin].defense_max};
+		var knockback_damage = 0;
+		if (nu_stats[target].locX + total_push <= COMBAT.margin) {
+			knockback_damage = COMBAT.margin - (nu_stats[target].locX + total_push);
+			nu_stats[target].locX = COMBAT.margin;
+		} else if (nu_stats[target].locX + total_push >= this.world.width - COMBAT.margin) {
+			knockback_damage = (nu_stats[target].locX + total_push) - (this.world.width - COMBAT.margin);
+			nu_stats[target].locX = this.world.width - COMBAT.margin;
 		} else {
-			current.damage.origin.fracture = 0;
-			next.unit_stats[origin].fracture = this.fighters[origin].defense_max;
+			nu_stats[target].locX += total_push;
 		}
+
+		attack.health += (((knockback_damage * COMBAT.knockback_damage_factor) - bfx[target]["simple.guard_normal"]) / bfx[target]["compound.guard_normal"]);
+		if (attack.defense_break){attack.health *= defense_break_amp * attack.fracture_amp};
 		
-
-		for (var i = 0; i < next.unit_stats[origin].buffs.length; ++i) {
-			var p = next.unit_stats[origin].buffs[i];
-			if(p.type == "attack"){if (p.duration > 0) { next.unit_stats[origin].buffs[i].duration-- } else { next.unit_stats[origin].buffs.splice(i, 1); i-- }};
+		if (Math.abs(cu_stats[origin].locX - cu_stats[target].locX) > COMBAT.attack_distance) {
+			cu_stats[origin].locX = cu_stats[target].locX + push_direction * -1 * COMBAT.attack_distance;
+			nu_stats[origin].locX = cu_stats[origin].locX;
 		}
 
-		for (var i = 0; i < next.unit_stats[target].buffs.length; ++i) {
-			var p = next.unit_stats[target].buffs[i];
-			if(p.type == "defend"){if (p.duration > 0) { next.unit_stats[target].buffs[i].duration-- } else { next.unit_stats[target].buffs.splice(i, 1); i-- }};
+		reflect.health = (reflect.health + (bfx[target]["simple.reflect_health"] * attack.health) - bfx[origin]["simple.guard_health"]) / bfx[origin]["compound.guard_health"];
+		reflect.defense = (reflect.defense + (bfx[target]["simple.reflect_defense"] * attack.defense) - bfx[origin]["simple.guard_defense"]) / bfx[origin]["compound.guard_defense"];
+		
+		if (reflect.defense >= cu_stats[origin].defense){
+			reflect.defense_break = true;
+			reflect.fracture = reflect.defense - cu_stats[origin].defense;
+			reflect.defense = cu_stats[origin].defense;
+
+			if (reflect.fracture >= reflect.fracture_ref){reflect.fracture = reflect.fracture_ref};
+			reflect.fracture_ref -= reflect.fracture;
+			reflect.fracture_amp += (COMBAT.fracture_amp_max - COMBAT.fracture_amp_max*(reflect.fracture_ref / this.fighters[origin].defense_max));
 		}
 
-		if (buff_effects[origin].stun_add > 0){
-			next.unit_stats[target].debuffs.push({
+		if (reflect.defense_break){reflect.health *= defense_break_amp * reflect.fracture_amp};
+
+		for (var i = 0; i < stat_keys.length; ++i) {
+			var p = stat_keys[i];
+
+			var attack_value = Math.round(attack[p]);
+			var reflect_value = Math.round(reflect[p]);
+
+			current.damage.target[p] = attack_value;
+			nu_stats[target][p] -= attack_value;
+
+			current.damage.origin[p] = reflect_value;
+			nu_stats[origin][p] -= reflect_value;
+		};
+
+		for (var i = 0; i < stat_leech.length; ++i) {
+			var p = stat_leech[i];
+			var base = p.split("_")[1]
+
+			var value = Math.round(attack[p]);
+			current.damage.origin[p] = value;
+
+			if (nu_stats[origin][base] + value >= this.fighters[origin][base + "_max"]){nu_stats[origin][base] = this.fighters[origin][base + "_max"]} else {nu_stats[origin][base] += value};
+		}
+
+		if (nu_stats[origin].defense < 0){nu_stats[origin].defense = 0};
+		nu_stats[origin].stamina -= this.fighters[origin].stamina_cost;
+
+		for (var i = 0; i < nu_stats[origin].buffs.length; ++i) {
+			var p = nu_stats[origin].buffs[i];
+			if(p.type == "attack"){if (p.duration > 0) { nu_stats[origin].buffs[i].duration-- } else { nu_stats[origin].buffs.splice(i, 1); i-- }};
+		}
+
+		for (var i = 0; i < nu_stats[target].buffs.length; ++i) {
+			var p = nu_stats[target].buffs[i];
+			if(p.type == "defend"){if (p.duration > 0) { nu_stats[target].buffs[i].duration-- } else { nu_stats[target].buffs.splice(i, 1); i-- }};
+		}
+
+		if (bfx[origin]["simple.stun"] > 0){
+			nu_stats[target].debuffs.push({
 				alias: "stun",
 				factor: 0,
-				duration: buff_effects[origin].stun_add
+				duration: bfx[origin]["simple.stun"]
 			})
 		};
 	}
@@ -156,27 +156,29 @@ define(function () {return function(){
 	this["__proto__"].actionCast = function(index){
 		var current = this.turn.sequence[index];
 		var next = this.turn.sequence[index + 1];
+		var cu_stats = current.unit_stats;
+		var nu_stats = next.unit_stats;
 
 		var origin = current.origin;
 		var target = current.target;
 		
-		next.unit_stats[origin].staminaregen.push(COMBAT.stamina_regen_duration)
+		nu_stats[origin].staminaregen.push(COMBAT.stamina_regen_duration)
 
-		if (next.unit_stats[origin].block + 1 >= COMBAT.blocks_max) {
-			next.unit_stats[origin].block = COMBAT.blocks_max;
+		if (nu_stats[origin].block + 1 >= COMBAT.blocks_max) {
+			nu_stats[origin].block = COMBAT.blocks_max;
 		} else {
-			next.unit_stats[origin].block++;
+			nu_stats[origin].block++;
 		}
 
-		if (current.unit_stats[origin].locX > current.unit_stats[target].locX) { var flee_direction = -1 } else { var flee_direction = 1 };
+		if (cu_stats[origin].locX > cu_stats[target].locX) { var flee_direction = -1 } else { var flee_direction = 1 };
 		var total_flee = flee_direction * COMBAT.cast_repel_factor * (COMBAT.cast_time_duration + COMBAT.cast_channel_duration);
 
-		if (next.unit_stats[target].locX + total_flee <= COMBAT.margin) {
-			next.unit_stats[target].locX = COMBAT.margin
-		} else if (next.unit_stats[target].locX + total_flee >= this.world.width - COMBAT.margin) {
-			next.unit_stats[target].locX = this.world.width - COMBAT.margin
+		if (nu_stats[target].locX + total_flee <= COMBAT.margin) {
+			nu_stats[target].locX = COMBAT.margin
+		} else if (nu_stats[target].locX + total_flee >= this.world.width - COMBAT.margin) {
+			nu_stats[target].locX = this.world.width - COMBAT.margin
 		} else {
-			next.unit_stats[target].locX += total_flee;
+			nu_stats[target].locX += total_flee;
 		}
 	}
 

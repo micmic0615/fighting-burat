@@ -1,6 +1,6 @@
 BUFFS.agility = {
 	effects:[{
-		name: "speed_up",
+		name: "compound.speed",
 		factor: 2,
 	}],
 	duration: 10,
@@ -21,13 +21,13 @@ BUFFS.agility = {
 
 BUFFS.bleed = {
 	effects:[{
-		name: "health_dmg_add",
+		name: "simple.attack_health",
 		factor: 100,
 	},{
-		name: "health_dmg_multiply",
+		name: "compound.attack_health",
 		factor: 2,
 	},{
-		name: "lifesteal_add",
+		name: "simple.leech_health",
 		factor: -150,
 	}],
 	duration: 0,
@@ -56,7 +56,7 @@ BUFFS.bleed = {
 
 BUFFS.armorbreak = {
 	effects:[{
-		name: "defense_dmg_add",
+		name: "simple.attack_defense",
 		factor: 180,
 	}],
 	duration: 12,
@@ -77,7 +77,7 @@ BUFFS.armorbreak = {
 
 BUFFS.damage = {
 	effects:[{
-		name: "normal_dmg_add",
+		name: "simple.attack_normal",
 		factor: 90,
 	}],
 	duration: 12,
@@ -98,13 +98,13 @@ BUFFS.damage = {
 
 BUFFS.acid = {
 	effects:[{
-		name: "defense_heal_add",
+		name: "simple.heal_defense",
 		factor: -60,
 	},{
-		name: "defense_dmg_add",
+		name: "simple.attack_defense",
 		factor: 90,
 	},{
-		name: "defense_dmg_reflect_add",
+		name: "simple.return_defense",
 		factor: 90,
 	}],
 	duration: 6,

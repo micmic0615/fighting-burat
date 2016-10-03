@@ -7,7 +7,7 @@ define(function () {return function(SCENE){
 		previous: null,
 		sequence: [],
 		sequence_max: 10,
-		foresight: 25,
+		foresight: 10,
 		reset: false,
 	}
 
@@ -23,12 +23,43 @@ define(function () {return function(SCENE){
 		mana_regen: 3.5,
 		reload: 99
 	};
+
+	SCENE.buff_effects = {
+		"simple.attack_normal": 0,
+		"simple.attack_health": 0,
+		"simple.attack_defense": 0,
+		"simple.attack_stamina": 0,
+		"simple.return_health": 0,
+		"simple.return_defense": 0,
+		"simple.return_stamina": 0,
+		"simple.reflect_health": 0,
+		"simple.reflect_defense": 0,
+		"simple.guard_normal": 0,
+		"simple.guard_health": 0,
+		"simple.guard_defense": 0,
+		"simple.heal_health": 0,
+		"simple.heal_defense": 0,
+		"simple.heal_stamina": 0,
+		"simple.heal_block": 0,
+		"simple.leech_health": 0,
+		"simple.leech_defense": 0,
+		"simple.leech_stamina": 0,
+		"simple.force": 0,
+		"simple.stun": 0,
+		"compound.attack_normal": 1,
+		"compound.attack_health": 1,
+		"compound.attack_defense": 1,
+		"compound.guard_normal": 1,
+		"compound.guard_health": 1,
+		"compound.guard_defense": 1,
+		"compound.speed": 1
+	}
 		
 	if (GLOBALS.my_buffs != undefined){
 		SCENE.player.buffs_available = JSON.parse(JSON.stringify(GLOBALS.my_buffs));
 		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(GLOBALS.my_buffs));
 	} else {
-		SCENE.player.buffs_available = ["agility", "armorbreak", "damage", "defense", "focusbreak", "force", "focus", "heal", "regen"];
+		SCENE.player.buffs_available = ["agility", "armorbreak", "attack", "defense", "focusbreak", "force", "focus", "heal", "regen"];
 		SCENE.player.buffs_decked = JSON.parse(JSON.stringify(SCENE.player.buffs_available));
 	}
 

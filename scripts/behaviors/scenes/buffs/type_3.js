@@ -1,6 +1,6 @@
 BUFFS.heal = {
 	effects:[{
-		name: "health_heal_add",
+		name: "simple.heal_health",
 		factor: 400,
 	}],
 	duration: 0,
@@ -21,7 +21,7 @@ BUFFS.heal = {
 
 BUFFS.regen = {
 	effects:[{
-		name: "health_heal_add",
+		name: "simple.heal_health",
 		factor: 25,
 	}],
 	duration: 20,
@@ -42,7 +42,7 @@ BUFFS.regen = {
 
 BUFFS.lifesteal = {
 	effects:[{
-		name: "lifesteal_add",
+		name: "simple.leech_health",
 		factor: 60,
 	}],
 	duration: 10,
@@ -71,16 +71,16 @@ BUFFS.lifesteal = {
 
 BUFFS.peacemaker = {
 	effects:[{
-		name: "normal_dmg_multiply",
+		name: "compound.attack_normal",
 		factor: 0.35,
 	},{
-		name: "health_heal_add",
+		name: "simple.heal_health",
 		factor: 25,
 	},{
-		name: "stamina_dmg_add",
+		name: "simple.attack_stamina",
 		factor: 10,
 	},{
-		name: "reduce_dmg_divide",
+		name: "compound.guard_normal",
 		factor: 1.5,
 	}],
 	duration: 3,
