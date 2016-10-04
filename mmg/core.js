@@ -144,6 +144,7 @@ MMG.render = function(){
 			MMG.stage.drawings.sort(keysrt("zIndex"));
 
 			for (var i = 0; i < MMG.stage.layers.length; i++) {
+				MMG.stage.layers[i].units.sort(keysrt("zIndex"));
 				var p = MMG.stage.layers[i];
 
 				if (p.bgColor != undefined){
@@ -151,10 +152,9 @@ MMG.render = function(){
 					MMG.ctx.fillRect(0,0,MMG.canvas.width,MMG.canvas.height);
 				};
 
-				p.units.sort(keysrt("zIndex"));
 				
-				for (var i2 = 0; i2 < p.units.length; i2++) {
-					var p2 = p.units[i2];
+				for (var i2 = 0; i2 < MMG.stage.layers[i].units.length; i2++) {
+					var p2 = MMG.stage.layers[i].units[i2];
 					
 					if (p2.scaleX*p2.scaleY > 0){var item_number = 0} else {var item_number = 1}
 					

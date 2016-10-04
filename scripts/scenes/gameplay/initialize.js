@@ -21,7 +21,7 @@ define(function () {return function(){
 		alias:'hero',
 		locX:(this.getScreen().width/4)*1,
 		locY:245,
-		zIndex: 100
+		zIndex: 11,
 	});
 	
 	this.newUnit("main", GLOBALS.match_players[1].stats._actortype, {
@@ -35,7 +35,7 @@ define(function () {return function(){
 	var sfx_dummy_count = 40;
 	while(sfx_dummy_count > 0){
 		sfx_dummy_count--;
-		this.sfx_dummies.push(this.newUnit("main", "buff_sfx", {zIndex: 101}));
+		this.sfx_dummies.push(this.newUnit("main", "buff_sfx", {zIndex: 101 + sfx_dummy_count}));
 	}
 
 

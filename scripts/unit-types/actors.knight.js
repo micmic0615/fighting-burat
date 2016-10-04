@@ -12,30 +12,30 @@ define(function () {var THIS_UNIT = function(){
 	this.prop("gear.legs", {name:"unarmored", def:1000, poise:25, weight:6});
 	this.prop("gear.weapon", {name:"basic_sword", atk:50, bns:5, cost:10, force:120, weight:5});
 
-	var animation_frame = {file:['shitty_wizard.png', 'shitty_wizard.png'], width:400, height:400, colliderWidth:80, colliderHeight:120, frames:1, fps:12};
+	var animation_frame = {file:['shitty_wizard.png', 'shitty_wizard.png'], width:330, height:230, colliderWidth:80, colliderHeight:120, frames:1, fps:12};
 
-	animation_frame.file = ['knight/attack.png', 'knight/attack-reverse.png']; animation_frame.frames = 5;
+	animation_frame.file = ['knight2/attack.png', 'knight2/attack-reverse.png']; animation_frame.frames = 6;
 	this.prop("animation.list.attack", JSON.parse(JSON.stringify(animation_frame)));
 
-	animation_frame.file = ['knight/counter.png', 'knight/counter-reverse.png']; animation_frame.frames = 6;
+	animation_frame.file = ['knight2/counter.png', 'knight2/counter-reverse.png']; animation_frame.frames = 10;
 	this.prop("animation.list.counter", JSON.parse(JSON.stringify(animation_frame)));
 	
-	animation_frame.file = ['knight/flinch.png', 'knight/flinch-reverse.png']; animation_frame.frames = 2;
+	animation_frame.file = ['knight2/flinch.png', 'knight2/flinch-reverse.png']; animation_frame.frames = 7;
 	this.prop("animation.list.flinch", JSON.parse(JSON.stringify(animation_frame)));
 
-	animation_frame.file = ['knight/cast.png', 'knight/cast-reverse.png']; animation_frame.frames = 1;
+	animation_frame.file = ['knight2/cast.png', 'knight2/cast-reverse.png']; animation_frame.frames = 10;
 	this.prop("animation.list.cast", JSON.parse(JSON.stringify(animation_frame)));
 
-	animation_frame.file = ['knight/guard.png', 'knight/guard-reverse.png']; animation_frame.frames = 2;
+	animation_frame.file = ['knight2/guard.png', 'knight2/guard-reverse.png']; animation_frame.frames = 8;
 	this.prop("animation.list.guard", JSON.parse(JSON.stringify(animation_frame)));
 
-	animation_frame.file = ['knight/resist.png', 'knight/resist-reverse.png']; animation_frame.frames = 2;
+	animation_frame.file = ['knight2/resist.png', 'knight2/resist-reverse.png']; animation_frame.frames = 7;
 	this.prop("animation.list.resist", JSON.parse(JSON.stringify(animation_frame)));
 	
-	animation_frame.file = ['knight/stand.png', 'knight/stand-reverse.png']; animation_frame.frames = 2;
+	animation_frame.file = ['knight2/stand.png', 'knight2/stand-reverse.png']; animation_frame.frames = 10;
 	this.prop("animation.list.stand", JSON.parse(JSON.stringify(animation_frame)));
 
-	animation_frame.file = ['knight/walk.png', 'knight/walk-reverse.png']; animation_frame.frames = 6;
+	animation_frame.file = ['knight2/walk.png', 'knight2/walk-reverse.png']; animation_frame.frames = 10;
 	this.prop("animation.list.walk", JSON.parse(JSON.stringify(animation_frame)));
 };
 

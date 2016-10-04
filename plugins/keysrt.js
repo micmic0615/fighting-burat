@@ -1,5 +1,9 @@
 function keysrt(key,desc) {
-  return function(a,b){
-   return desc ? ~~(a[key] < b[key]) : ~~(a[key] > b[key]);
-  }
+	return function(a,b){
+		if (desc == "asc") {
+			return parseFloat(b[key]) - parseFloat(a[key]) ;
+		} else {
+			return parseFloat(a[key]) - parseFloat(b[key]);
+		}
+	}
 }

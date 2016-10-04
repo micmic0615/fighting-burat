@@ -370,14 +370,17 @@ define(function () { return function(){
 
 				var origin = this.getUnit(current.origin);
 				var target = this.getUnit(current.target);
-
-
+				
+				
 				
 				switch(this.turn.phase){
 					case -1:
 						if (Math.abs(origin.locX - target.locX) < COMBAT.attack_distance){changeTurnPhase.bind(this)()} else {origin.walkForward(); target.walkForward()};
 						break
-					case 0: 							
+					case 0: 	
+						origin.zIndex = 11;
+						target.zIndex = 10;
+						
 						origin.setStats(current.unit_stats[current.origin]);
 						target.setStats(current.unit_stats[current.target]);
 						origin.animation.speed = 1;
