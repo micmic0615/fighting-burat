@@ -227,7 +227,7 @@ MMG.render = function(){
 			for (var i = 0; i < MMG.stage.drawings.length; ++i) {var p = MMG.stage.drawings[i]; if (p.type != null && p.life > 0){
 				switch (p.type){
 					case "flyingText": 
-						p.life--;
+						p.life -=2;
 						MMG.ctx.font = p.fontSize + "px " + p.fontFamily;
 						MMG.ctx.fillStyle = p.color;					
 						MMG.ctx.globalAlpha = p.life/p.life_max;
@@ -298,7 +298,6 @@ MMG.render = function(){
 								case "right": var textX = posX + sizeX - textWidth; break;
 								case "center": var textX = posX + sizeX/2 - textWidth/2; break;
 							}
-
 
 							MMG.ctx.fillStyle = p.color;
 							MMG.ctx.fillText(p.text, textX, textY);

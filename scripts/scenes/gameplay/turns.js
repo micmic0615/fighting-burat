@@ -10,13 +10,17 @@ define(function () { return function(){
 		delete GLOBALS.winner_id;
 		delete GLOBALS.turn_data;
 		delete GLOBALS.match_players;
-		RAN.clear();
-		MMG.loadScene("menu");
+		RAN.clear();		
+		game_over_delay = -100;
 	}.bind(this));
 
 	SOCKET.on("res.game_buff_send", function(res){
 		this.getUnit(res.unit_alias).prebuffs = res.buffs
 		this.turn.index = res.turn_index;
+		this.turn.phase = 0;
+		game_over = false;
+		game_over_delay = 1;
+
 		RAN.set_seed(res.seed_index);
 
 		if (res.unit_alias == GLOBALS.my_fighter){
@@ -26,7 +30,7 @@ define(function () { return function(){
 	}.bind(this));
 
 	var game_over = false;
-	var game_over_delay = 100;
+	var game_over_delay = 1;
 
 	function initializeStats(alias, locX){
 		var unit = this.getUnit(alias);
@@ -418,7 +422,7 @@ define(function () { return function(){
 						break
 
 					case 3:		
-						if (this.getUnit(GLOBALS.my_fighter).queuebuffs.length > 0){
+						if (this.getUnit(GLOBALS.my_fighter).queuebuffs.length > 0 && this.getUnit(GLOBALS.my_fighter).current.health > 0){
 							SOCKET.emit("req.game_buff_send", {
 								game_id: GLOBALS.game_id, 
 								turn_index: this.turn.index, 
@@ -437,26 +441,26 @@ define(function () { return function(){
 						break;
 				};
 			} else {
-				if (game_over_delay > 0){
-					if (game_over_delay == 100){
-						var hero = this.getUnit("hero");
-						var enemy = this.getUnit("enemy");
+				if (game_over_delay == 1){SOCKET.emit("req.game_end", {game_id: GLOBALS.game_id, winner_id: GLOBALS.winner_id, user_id: USER._id});}
+								
+				if (game_over_delay == -100){
+					var hero = this.getUnit("hero");
+					var enemy = this.getUnit("enemy");
 
-						if (GLOBALS.my_fighter == "hero"){
-							if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU LOSE"};
-							if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU WIN"; GLOBALS.winner_id = USER._id};
-						} else {
-							if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU WIN"; GLOBALS.winner_id = USER._id};
-							if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU LOSE"};
-						}
-						
-						this.drawObj("flyingText", {text: message, color:"#000", fontSize: 54, life:100, x: MMG.resolution.width/2, y: MMG.resolution.height/2 + 50, angle: 270});
-					}		
+					if (GLOBALS.my_fighter == "hero"){
+						if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU LOSE"};
+						if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU WIN"; GLOBALS.winner_id = USER._id};
+					} else {
+						if (hero.current.health <= 0 ){hero.setAnimation("flinch"); var message = "YOU WIN"; GLOBALS.winner_id = USER._id};
+						if (enemy.current.health <= 0 ){enemy.setAnimation("flinch"); var message = "YOU LOSE"};
+					}
+					
+					this.drawObj("flyingText", {text: message, color:"#000", fontSize: 54, life:100, x: MMG.resolution.width/2, y: MMG.resolution.height/2 + 50, angle: 270});
+				}	
 
-					game_over_delay--;
-				} else {
-					SOCKET.emit("req.game_end", {game_id: GLOBALS.game_id, winner_id: GLOBALS.winner_id});
-				}
+				if (game_over_delay == -200){MMG.loadScene("menu")};
+
+				if (game_over_delay > 0 || game_over_delay <= -100){game_over_delay--};
 			}
 			
 		};

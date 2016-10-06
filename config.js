@@ -2,7 +2,7 @@ var MMG = {};
 var CONF = {};
 
 
-MMG.cps = 50;
+MMG.cps = 30;
 MMG.fps = 60;
 MMG.tileSize = 80;
 MMG.collisions = false;
@@ -74,7 +74,7 @@ var COMBAT = {
 	fracture_regain: 0.01,
 	fracture_amp_max: 1,
 
-	unit_movespeed: 2.5,
+	unit_movespeed: 3,
 
 	buffs_use_max: 10,
 
